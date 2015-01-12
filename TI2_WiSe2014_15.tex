@@ -1,0 +1,2005 @@
+%%!TEX TS-program = latex
+%% https://www.writelatex.com/1588875rkggkp\# /3954162/
+
+\documentclass[11pt]{article}
+\usepackage[a4paper]{geometry}
+%\usepackage[pdftex]{graphicx}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{array}
+
+% Theorem Styles
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{corollary}[theorem]{Corollary}
+%% Definition Styles
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+%\newtheorem{example}{Example}[section]
+%\theoremstyle{remark}
+%\newtheorem{remark}{Remark}
+
+\usepackage{longtable}
+
+% Graphen etc.
+\usepackage{pst-node}
+\usepackage{pst-tree}
+
+\newcommand{\rcirclenode}[3]{
+	\circlenode{\# 1}{\parbox{\# 2}{\centering\# 3}}
+}
+
+\usepackage{hyperref}
+
+% Das Dokument beginnt hier
+\begin{document}
+
+\setlength{\parindent}{0pt}
+
+% Erstelle eine Hauptüberschrift
+
+\title{Theoretische Informatik}
+\author{}
+\date {}
+
+\maketitle
+
+\tableofcontents
+
+\part{Complexity Theory}
+\section{Randomized Complexity Classes}
+
+\subsection{Examples}
+
+\subsubsection{Evaluation of Symbolic Determinants}
+
+\marginpar{s. Folien Hasso-Plattner-Institut}
+
+\paragraph{Given:} a bipartite undirected graph $ G = (U \cup V, E) $, $ U = \{u_1, \dots, u_n \} $, $ V = \{ v_1, \dots, v_n \} $
+
+\paragraph{Question:} Does there exist a perfect matching in G? (\textit{perfect matching:} each $ u_i $ is matched to exactly one $ v_i $, see Figure \ref{fig:perfectMatching})
+
+%%%% Graphic Perfect Matching
+
+\begin{figure}
+	\begin{subfigure}[b]{.5\linewidth}
+		\centering
+		\psmatrix[rowsep=0.4cm, colsep=2.5cm]
+		1 & 1 \\
+		2 & [mnode=circle] 2 \\
+		3 & 3 \\
+		4 & 4 \\
+		u & v
+		\psset{arrows=-,nodesep=3pt}
+		\ncline{1,1}{1,2}
+		\ncline{2,1}{3,2}
+		\ncline{3,1}{1,2}
+		\ncline{4,1}{4,2}
+		\endpsmatrix
+		\caption{no}
+	\end{subfigure}%
+		\begin{subfigure}[b]{.5\linewidth}
+		\centering
+		\psmatrix[rowsep=0.4cm, colsep=2.5cm]
+		1 & 1 \\
+		2 & 2 \\
+		3 & 3 \\
+		4 & 4 \\
+		u & v
+		\psset{arrows=-,nodesep=3pt}
+		\ncline{1,1}{1,2}
+		\ncline{2,1}{3,2}
+		\ncline{3,1}{1,2}
+		\ncline{4,1}{4,2}
+		\ncline{2,1}{2,2}
+		\ncline{1,1}{3,2}
+		\endpsmatrix
+		\caption{yes}
+	\end{subfigure}
+	\caption{Perfect matching?}
+	\label{fig:perfectMatching}
+\end{figure}
+
+\paragraph{Comment:} There is a polynomial deterministic algorithm for this problem, but here we will look at a specific random approach instead.
+
+\medskip
+
+In the adjacency matrix $ A(G)$, an entry is 0 if there is no edge between $ u $ and $ v $ and a variable $ x_{ij} $ if there is.
+
+Then, with $ S_n $ as the set of permutations over $ \{ 1, \dots, n \} $:
+\[ \det A(G) = \sum \limits_{\pi \in S_n} \sigma (\pi) \cdot \prod \limits_{i=1}^n a_i \pi (i) \]
+The product is 0 if there is no matching. ($ \sigma $ is 1 for odd and -1 for even)
+
+\paragraph{Observations:}
+\begin{enumerate}
+\item The non-zero terms in $ \det A (G) $ correspond to perfect matchings
+\item $ G $ does contain the perfect matching $ \Leftrightarrow ~ \det A (G) $ is not the zero function
+\end{enumerate}
+$ \rightarrow $ evaluate the determinant as an alternative method to answer the question.
+
+\medskip
+
+For given values of $ x_{ij} $, the determinant of $ A (G) $ can be computed in polynomial time. For symbolic determinants, there is no polynomial time algorithm known. It is already an NP-complete problem to determine if a coefficient of a symbolic determinant is $ \neq $ 0. The exact value of the determinant is not necessary, only whether it is 0 or not.
+
+\paragraph{Idea:} choose values for $ x_{ij} $ randomly (non-neg. integers) and evaluate the resulting classical determinant. 2 cases:
+\begin{enumerate}
+\item result $ \neq 0 \Rightarrow \det A (G) \equiv 0 \Rightarrow G $ contains perfect match
+\item result $ 0 \Rightarrow $ not finished ($ x_{ij}$s are zero of $ \det A (G) $ or $ \det A(G) \equiv 0 $. Iterate, after a certain no. of iterations, it is unlikely that $ \det A (G) \not\equiv 0$, but we will always end up in case 2
+\end{enumerate}
+
+\begin{lemma}
+
+Let $ p (z_1, \dots, z_m) $ be a polynomial in $ m $ variables, $ p \not\equiv 0 $. The degree in each variable is bounded by $ d $. Let $ M \geq 0, M \in \mathbb{Z} $.
+\[ \underbrace{| \{ z_1, \dots, z_m \} \in \{ 0, 1, \dots, M-1\}^m : p (7_1, \dots, z_m) = 0 \} |}_{\text{number of zeros}} \leq m \cdot d \cdot M^{m-1} \]
+
+\end{lemma}
+
+\begin{proof} by induction on $ m $
+
+\begin{itemize}
+\item $ m = 1 $: no. of zeros of a single var. polynomial of degree $ \leq d $ is $ \leq d $ (fund. theorem of algebra)
+\item $ m - 1 \rightarrow m $: a polynomial in $ z_1, \dots, z_m $ can be thought as a polynomial in $ z_m $ where the coefficients are polynomials in $ z_1, \dots, z_{m-1} $.
+
+If $ p $ evaluates to zero for a test point:
+	\begin{itemize}
+	\item Case A: the coefficient of the highest degree term is zero
+	\item Case B: the coefficient of the highest degree term is not zero
+	\end{itemize} \medskip
+	
+	Case A: apply induction hypothesis to the coefficient of $z_m$ with highest degree. Case A can arise for $\leq (m - 1) \cdot d \cdot M^{m - 2} $
+	
+	$ m -1$ tuples \bigskip
+	
+	Case B: polynomial of degree $ \leq $ d in $ z_m $ which has $ \leq d $ zeros for each $ m - 1 $ tuple $ (z_1, \dots, z_{m - 1} ) \Rightarrow < d \cdot M^{m - 1} $ additional zeros.
+\end{itemize}
+
+\end{proof}
+
+
+Back to the problem: consider the following algorithm:
+
+\begin {enumerate}
+\item set $ m = |E| $ and M = $z_m $ for matching cases.
+
+	Comment: algorithm works for more general determinant but then choose m and M accordingly
+\item compute set A (G) for this setting of $x_{I j} $ of
+
+if det A (G) = 0, the reply is ``do not know'' $ \rightarrow $ iterate. After some time you might answer ``G likely does not contain perfect matching''.
+\end {enumerate}
+
+\paragraph{Observation:}
+\begin{itemize}
+\item algorithm never replies with YES by mistake, no false positives
+
+\item algorithm can provide false negatives.
+
+What is the probability for false negatives? (or of no answer, in other interpretation)
+
+\end{itemize}
+
+error bound for matching case d=1
+it is easy to show that prob. (false negatives) $\leq 0.5 $ for one iteration $\rightarrow$ k repetitions $\rightarrow \leq \frac{1}{2^k} $
+
+this a algorithm belongs to the class of Monte Carlo algorithms.
+
+\subsubsection{SAT (Satisfiability)}
+
+\paragraph{Given:} SAT formula $\Phi $, variables $ x_1, ..., x_n$, clauses $ c_1, ..., c_m$
+
+disjunction of literals $x_3 \vee x_5 \vee x_7 $
+
+$ c_1 \wedge c_2...$
+
+\paragraph{Question:} does there exist a satisfying truth assignment i.e. an assignment of true and false to $ x_i $ so that all clauses are fulfilled?
+
+\paragraph{Special cases of SAT:}
+\begin{itemize}
+\item 2-SAT: $\leq 2$ literals per clause. Solvable in polynomial time
+\item 3-SAT: $\leq 3$ literals per clause. NP-complete
+\end{itemize} \medskip
+
+Consider the following algorithm:
+\begin {enumerate}
+\item start with an arbitrary truth assignment T for the variables $x_1,... x_n$
+
+\item apply the following $ n $ times.
+	\begin{itemize}
+	\item If T fulfills $\Phi$, answer YES and stop.
+	\item if T does not fulfill, choose a violated clause and an arbitrary literal from that clause. Flip its value (true to false or false to true)
+	\end{itemize}
+\end {enumerate}
+
+
+%%% 6. Oktober
+
+We repeat the main step $ r $ times and then stop with answer ``NO'' if we haven't stopped the algorithm before.
+
+\paragraph{Question:} How to choose $ r $? Does ist suffice to work with a polynomially bounded $ r $ in order to obtain a reasonable error (false negative) bound?
+
+\paragraph{Answer:} Already for the 3-SAT, an exponential no. of iterations is required in general. For 2-SAT there exists a polynomial bound. Choosing $ r = 2^n $ leads to an error probability of $ \leq \frac{1}{2} $. S. 1st exercise sheet.
+
+$ \rightarrow $ Monte Carlo algorithm for 2-SAT
+
+\subsubsection{Identity testing for polynomials}
+
+We assume that the polynomials we deal with are represented/given via an algebraic circuit
+
+\paragraph{Comment:} logical circuit $ \wedge, \vee, \not $
+
+Analogously: algebraic circuit with the operators $ +, -, \cdot $ with variables $ x_1, \dots, x_n $. It is represented as a special directed graph as follows (see Figure \ref{fig:algcircuit}):
+
+$ n $ source nodes $ x_1, \dots, x_n $
+
+%%% Figure 1
+
+\begin{figure}
+\centering
+$ \pstree[treemode=U,nodesepB=3pt,arrows=<-,levelsep=1cm]{\Tcircle{+}}{%
+\pstree[treemode=U,nodesepB=3pt,arrows=<-,levelsep=1cm]{\Tcircle{\circ}}{\Tcircle{x_1} \Tcircle{x_2}}
+\Tcircle{x_3}}
+$
+\caption{Algebraic circuit}
+\label{fig:algcircuit}
+\end{figure}
+
+\paragraph{Remark:} Model can easily be extended, e.g. introduction of constants
+
+Let ZERO P be the class of algebraic circuits that evaluate to a polynomial which equals the 0-polynomial.
+\[ C \equiv C' \Leftrightarrow C - C' \equiv 0 \]
+
+\paragraph{Example of an algebraic circuit:}
+\[ \prod \limits_{i = 1}^n (1 + x_i ) \] as an algebraic circuit:
+
+%%% Figure 2
+
+\begin{figure}
+\centering
+\psmatrix[mnode=circle,colsep=1]
+1 & & $ x_1 $ & & $ x_2 $ & & $ x_n $ \\
+& + & & + & & + \\
+& & & $ \circ $ \\
+& & & result
+\endpsmatrix
+\psset{shortput=nab,arrows=->}
+\small
+\ncline[linestyle=dotted,arrows=-,nodesep=15pt]{1,5}{1,7}
+\ncline{1,1}{2,2}
+\ncline{1,3}{2,2}
+\ncline{1,5}{2,4}
+\ncline{1,1}{2,4}
+\ncline{1,1}{2,6}
+\ncline{1,7}{2,6}
+\ncline{2,2}{3,4}
+\ncline{2,4}{3,4}
+\ncline{2,6}{3,4}
+\ncline{3,4}{4,4}
+\bigskip
+\caption{$\prod \limits_{i = 1}^n (1 + x_i ) $ as an algebraic circuit}
+\label{fig:algcircuitprod}
+\end{figure}
+
+If the polynomial is multiplied out, one has $ O (2^n) $ terms.
+\medskip
+
+No polynomial time algorithm is known to decide if two polynomials are identical.
+But randomization helps.
+
+The following lemma along the lines of L 1.1 %% reference
+will play an important role
+
+\begin{lemma}
+
+%%% Todo: B as calligraphic
+
+Let $ p (x_1, \dots, x_n) $ be a polynomial of total degree at most $ d $. Let $ S $ be a finite set of integers. Then, if $ a_1 \dots a_m $ are randomly chosen from $ S $, then we have $ Prob [p (a_1, \dots, a_m) \neq 0 \geq 1 - \frac{d}{|S|}] $
+
+(total degree: monomial $ x_1^{e_1} x_2^{e_2} \dots x_n^{e_n} $ has total degree $ e_1 + e_2 + \dots + e_n $)
+
+\end{lemma}
+
+\paragraph{Observation:} A circuit of size $ m $ has at most $ m $ multiplications and thus has at most degree $ 2^m $.
+
+$ \rightarrow $ Choose the variables $ x_1, \dots, x_n \in \{1, \dots, 10.2^m \} $. %%% why?
+This requires $O(nm)$ random bits
+
+$ \rightarrow $ Evaluate the circuit $ C $ on $ x_1, \dots, x_n $ to obtain an output $ y $,
+\begin{itemize}
+\item answer with ``YES'' if $ y \neq 0 $
+\item reject otherwise
+\end{itemize}
+
+If $ C \in ZERO P $, then we will always accept.
+
+If $ C \not\in ZERO P $, then we will reject with probability $ \geq \frac{9}{10} $. Multiple repetitions will decrease the error probability.
+
+The problem with the approach discussed above is that very large numbers can show up for y and the intermediary results (up to $(10.2^m)^{2^m}$ needs exponentially bits to write down)
+
+Apply technique which is sometimes also called ``fingerprinting'': perform the calculations modulo $ K $ where $ K $ is an integer chosen randomly from $ \{1, \dots, 2^{2m}\} $. Instead of computing $ y = C (x_1, \dots, x_n) $, we compute $ y \mod K $.
+
+If $ y = 0$, then $ y \mod K $ too.
+
+Claim: If $ y \neq 0 $, then with probability $ \geq \delta \frac{1}{4m} $, $ K $ does not divide y
+(Suffices for our purposes because we can repeat our procedure $ O (\frac{1}{\delta}) $ times and accept only if the output is zero in all repetitions)
+
+Assume $ y \neq 0 $ and let $ B = \{ p_1, \dots, p_e\} $ denote the set of distinct prime factors of $ y $.
+
+It is sufficient to show that with probability $ \geq S $, $ K $ will be a prime number not in $ B $. By the Prime Number Theory, we get for a sufficiently large $ m $ the number of primes $ \leq 2^{2m} $ is at least $ \frac{2^{2m}}{2m} $. Since $ y $ can have at most $ \log y \leq Sm 2^m = O (\frac{2^{2m}}{2m} $ prime factors
+
+$ \Rightarrow $ for sufficiently large $m$, the number of $ K$'s from $ \{1, \dots, 2^{2m}\}$, such that $ K $ is prime and is not in $ B $ is at least $ \frac{2^{2m}}{4m}  \Rightarrow $ a random $ K $ will have the desired properties with probability $ \geq \frac{1}{4} = \delta $.
+
+\subsubsection{Prime Number Test}
+
+\paragraph{Given:} an odd integer $ n $
+\paragraph{Question:} Is $ n $ a prime number?
+
+Deterministic polynomial algorithm fairly recent. Randomized algorithm: Monte Carlo.
+
+\subsection{Complexity Classes Introduced in this Chapter and their Interrelations}
+
+%%% TODO: left-bound, spacing between lines
+\bgroup
+\def\arraystretch{1.5}
+\begin{tabular}{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{3.5cm}| >{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{5cm} | >{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{5cm}}
+& probability for error/failure bounded$^\ast$ & probability for error/failure non-bounded$^\ast$ \\
+\hline
+\hline
+two-sided error & BPP & PP \\
+\hline
+one-sided error & RP (Monte Carlo alg.): no false positives, false negatives possible, Co-RP (complement of RP) & NP, Co-NP \\
+\hline
+no error, but failure possible & ZPP $ > $ RP $ \cap $ Co-RP$^\ast$ (Las Vegas algorithm) & NP $ \cap $ Co-NP \\
+\hline
+no error, no failure & P & \\
+\end{tabular}
+\egroup \medskip
+
+$\ast$ defined in this chapter
+
+\subsection{RP (Randomized Polynomial)}
+
+\paragraph{Key Concept:} Monte Carlo Turing Machine (TM)
+
+\paragraph{Definition: } Let $ N $ be a polynomial, non-deterministic TM. We assume in the following that all computation on $ N $ with input $ x $ end after the same (polynomial on $ |x| $) number of steps and that there are exactly 2 alternatives in each decision step.
+
+Let $ L $ be a language, $ N $ is called a Monte Carlo TM for $ L $ if
+\begin{itemize}
+\item $ N $ fulfills the assumptions made above,
+\item the computations on an input of size $ n $ takes $ p(n) $ time (with $ p $ polynomial),
+\item and if holds:
+	\begin{itemize}
+	\item If $ x \not\in L $, then all computations of $ N $ with input $ x $ end with the answer ``NO'' (no false positives)
+	\item If $ x \in L $, then at least half of the computations of $ N $ with input $ x $ end with ``YES'' (probability for a false negative answer is $ \leq \frac{1}{2} $
+	\end{itemize}
+\end{itemize}
+
+\paragraph{Definition of the complexity class RP:} The class of all languages for with there exists a Monte Carlo TM is called RP.
+
+\paragraph{Comments:}
+\begin{itemize}
+\item The concept of MC TM matches with the intuitive idea developed in examples.
+\item Replacing the bound $ \frac{1}{2} $ for the probability of false negatives by some number $ < 1 $ does not lead to a new complexity class.
+
+$ 1 - \epsilon $ with $ \epsilon < \frac{1}{2} $ be the probability for false negatives. $ K $ repretitions $ \rightarrow (1- \epsilon9^K ) $ ist the probability for false negatives. Running time $ K O (p (n)) $, polynomial for polynomial K
+\item RP is somewhere between P and NP
+\item Co-RP is the complement of RP ($ \rightarrow $ complement of a language, exchange ``YES'' and ``NO'')
+\item not only RP is a randomized complexity class
+\end{itemize}
+
+\subsection{ZPP}
+ZPP $ := $ RP $ \cap $ Co-RP. No mistakes, no false positives, no false negatives but failure (i.e. no decision obtained) can happen. Such an algorithm is called Las Vegas algorithm.
+
+\subsection{PP}
+Consider the MAJSAT (Majority SAT) problem:
+\paragraph{Given:} SAT formula $ \Phi $ in $ n $ variables
+\paragraph{Question:} Is it true that the majority of the $ 2^n $ truth assignments, i. e. $ > 2^{n-1} $, are satisfying assignments for $ \Phi $?
+
+It is unknown whether MAJSAT $ \in $ NP (unlikely)
+
+\paragraph{Definition PP:} A Language $ L $ is in PP if there exists a non-deterministic polynomial TM $ N $ (fulfilling the assumptions above) such that for all inputs $ x $ we have the following:
+$ x \in L \Rightarrow $ more than one half of the comp. of $ N $ end with answer ``YES'' (acceptance).
+
+This definition is syntactical and not semantical. Not based on alg. point of view. MAJSAT $ \in $ PP. Proof easy.
+
+MAJSAT is PP-complete
+
+\begin{theorem}
+
+NP $ \subseteq $ PP
+
+\end{theorem}
+
+%% adequate for oral exam
+
+\begin{proof} Let $ L \in $ NP. Let $ N $ be a non-det. polyn. TM for $ L $. We now construct a new TM $ N' $ which decides $ L $ according to the majority principle. $ N' $ is very similar to $ N $, we add a new starting state (see Figure \ref{fig:tm}).
+
+%%% Figure 3
+
+\begin{figure}
+\centering
+
+\pstree[nodesepB=0pt,arrows=-]{\Toval{new starting state}}{%
+\pstree[nodesep=0pt]{\Tc*{0pt}}{
+\pstree[linestyle=none,arrows=-,nodesep=1pt,levelsep=0.5cm]{\Tfan[fansize=20ex]}{\TR{computations of $ N $}}}
+\pstree[nodesep=0pt]{\Tc*{0pt}}{
+\pstree[linestyle=none,arrows=-,nodesep=1pt,levelsep=0.5cm]{\Tfan[fansize=20ex]}{\TR{arbitrary computations that always return YES}}}} \bigskip
+
+\caption{Majority principle TM}
+\label{fig:tm}
+\end{figure}
+
+Input $ x $ requires $ p(|x|) $ steps on $ N $. $ 2^{|x|} $ different computation routes on $ x $ for $ N $.
+
+$ 2 \cdot 2^{|x|} > 2^{|x| + 1} $ comp. paths of $ N' $ on $ x \rightarrow $ more than $ 2^{|x|} $ YES paths $ \Leftrightarrow x \in L \Rightarrow L \in PP $.
+
+\end{proof}
+
+\subsection{BPP (Bounded Error Probabilistically Polynomial)}
+
+False positives and false negatives possible (``two-sided error'').
+
+\paragraph{Definition: } BPP contains all languages L, for which $ \exists $ non-deterministic polynomial TM $ N $ (without loss of generality = wlog) + fulfilling the assumptions above, such that
+\begin{itemize}
+\item For all inputs $ x $ such that $ x \in L $, at least a percentage of $ \frac{3}{4} $ of all compositions of $ N $ on $ x $ end with acceptance
+\item For all inputs $ x $ such that $ x \not \in L $, at least $ \frac{3}{4} $ of all compositions of $ N $ on $ x $ end with rejection.
+\end{itemize}
+
+\paragraph{Comments:}
+\begin{itemize}
+\item $ \frac{3}{4} $ not essential, can be replaced by values $ > \frac{1}{2} $ and $ < 1 $
+\item the definition above means that the probability for false positives and false negatives is $ \frac{1}{4} $
+\item RP $ \subseteq $ BPP, Co-RP $ \subseteq $ BPP (repeating MC alg. twice $ \rightarrow $ error probability $ \leq \frac{3}{4} $
+\item BPP $ \subseteq $ PP (follows trivially from definition)
+\item It is open whether BPP $ \subseteq $ NP
+\item It is open whether there exist BPP-complete problems
+\item Co-BPP = BPP
+\item BPP can be seen as a model for ``useful'' polynomial randomized algorithms
+\end{itemize}
+
+\subsection{Probability and Bias}
+
+Our randomized algorithms are based on random decision, for which we need random bits/numbers, e.g. obtained through coin flip. Suppose the coin is biased (not fair), i.e. $ Prob(\text{result of coin flip = head}) \neq \frac{1}{2} $.
+
+This does not influence RP/BPP. Idea: show that with a biased coin, you can simulate a fair coin
+
+\begin{lemma}
+
+A coin with $ Prob(\text{head}) = \rho $ can be simulated by a probabilistically polynomial (see detour below) %%%% label and reference
+TM in expected time $ O(1) $ if the $i$-th bit of $ \rho $ can be determined in polynomial time in $ i $ (relevant assumption for the case $ \rho $ irrational).
+
+\end{lemma}
+
+\begin{proof}
+
+Let $ 0.p_1 p_2 p_3\dots $ be the representation of $ \rho $ in a binary system. The prob. TM (rand. alg) constructs a sequence of random bits $b_1 b_2 b_3 \dots $ where bit $ b_i $ is generated in the $ i $-th step.
+
+If $ b_i < p_i $, then the TM delivers ``tail'' and stops. Otherwise it continues with the next bit (step $ i + 1 $). If the TM arrives at step $ i + 1 $, we have $ b_j = p_j $ for all $ j = 1, \dots, i $.
+The probability for this is $ (\frac{1}{2})^i \rightarrow Prob(\text{head}) = \sum \limits_k p_k \cdot (\frac{1}{2})^k = s $.
+
+Expected running time: $ \sum \limits_k k^c (\frac{1}{2})^k $ with some constant c bounded by constant $ \rightarrow $ running time $ O (1) $.
+
+\end{proof}
+
+\begin{lemma}
+A coin with $ Prob(\text{head}) = \frac{1}{2} $ (i.e. a fair coin) can be simulated via access to biased coins with $ Prob(\text{head}) = S \not \in \{0, \frac{1}{2}, 1\} $ in expected time $ O(\frac{1}{\rho \cdot (1- \rho}) $.
+\end{lemma}
+
+\begin{proof}
+Idea: replace one flip of fair coin by sequence of tossed of biased coins. Our TM $ M $ tosses pairs of coins until it gets for the first time a pair with two different results
+\begin{itemize}
+\item coin 1: head, coin 2: tail with prob. $ \rho (1 - \rho) \rightarrow $ output ``head''
+\item coin 1: tail, coin 2: head with prob. $ (1 - \rho) \rho $ output ``tail''
+\end{itemize}
+Then: probability for stop in certain step = $ 2 \rho (1 - \rho) $
+
+$ \Rightarrow $ conditioned on M is stopping in a particular step, the results head and tail for $ M $ are arising with the same probability of $ \frac{1}{2} $.
+
+Claimed expected runtime follows immediately from above
+\end{proof}
+
+\paragraph{Comment:} From the above, it follows that a fair coin can be simulated in expected polynomial time by biased coin. We used polynomial worst-case time and not polynomial expected time def. of RP/BPP. However, it is easy to show that it suffices to require polynomial expected running time in the definition of RP/BPP
+
+\subsubsection*{Detour: Concept of Pobabilistic TM}
+Alternative model for randomized computation
+
+2 transition funcitons $ \delta_0, \delta_1 $, in each step we decide with probability $ \frac{1}{2} $ each to use $ \delta_0 $ or $ \delta_1 $.
+
+In the general model for a pobabilistic TM, one requires a polynomial expected running time
+
+$ \rightarrow $ RP and BPP stay the same under biased coins. Proof for the technical part from expected to worst case polyn. time not shown above, but can be done
+
+%%%% FIGURE 4
+
+\section{The Complexity Class FP, Functional Problems and the Polynomial Hierarchy}
+
+\subsection{Functional Problems}
+
+\paragraph{Motivation: } Many problems are not of the decision problem type and have more complex answer options than ``YES'' and ``NO''.
+
+\subsection{Examples}
+
+\subsubsection{FSAT}
+\paragraph{Given:} SAT formula $ \Phi $
+\paragraph{Task:} If there exists a satisfying truth assignment for $ \Phi $, output one and otherwise answer ``There does not exist a satisfiable formula''
+
+Suppose for now that there exists a polynomial time algorithm for SAT (decision problem). Then there exists a polynomial time algorithm for FSAT.
+
+Consider the following algorithm:
+\begin{enumerate}
+\item Apply the SAT algorithm $ A $ to $ \Phi $. If the answer of A is ``NO'', then stop and answer ``$\Phi $ is not satisfiable''. Otherwise with step 2.
+\item (Successive fixing of variables $ x_1, \dots x_n $) \\ Apply branching according to $ x_i $, with  $ i  = 1, \dots, n $: Restrict the current SAT formula once to $ x_ i = $ true and once to $ x_i = $ false $ \rightarrow $ two new SAT formulas. Apply algorithm $ A $ to both of them. At least once we get answer ``YES''. Fix $ x_i $ to true of false so that the corresponding xxx SAT formula is satisfiable (leads to answer ``YES'' when $ A $ was accepted)
+\end{enumerate}
+
+After at most $ n $ steps, we are finished and have obtained a satisfying truth assignment. $ O(n) $ calls to SAT alg. $ A \rightarrow $ the alg. has polynomial running time provided $ A $ has polyn. running time.
+
+\subsubsection{TSP: Travelling Salesman Problem}
+
+\paragraph{Given:} Distance matrix $ D = (d_{ij}) $ with $ d_{ij} \in \mathbb{Z} $
+
+\paragraph{Task:} Find a TSP tour with minimal length
+
+\paragraph{TSP$_\text{Decision}$:} distance matrix as above, distance bound $ d^\ast $
+\paragraph{Question: } Does there exist a TSP tour with length $ \leq d^\ast $?
+
+Again we want to show that we could solve TSP in polyn. time, provided that TSP$_\text{DEC}$ can be solved in polyn. time.
+
+Consider the following procedure:
+\begin{enumerate}
+\item Determine the length of an optimal tour (binary search): can be bounded, e.g. by $ 2^q $ where $ q $ is the coding length of the instance. We can assume that the possible length values for the tour come from $ \{0, 1, \dots, 2^q\} \rightarrow $ apply binary search with respect to the tour length. First question: Does there exist a TSP tour with length $ \leq 2^q $?
+	\begin{itemize}
+	\item yes $ \rightarrow $ proceed with the set $ \{0, 1, \dots, 2^{q-1}\} $.
+	\item no $ \rightarrow $ proceed with the set $ \{2^{q-1} + 1, \dots, 2^{q}\} $.
+	\end{itemize}
+	 Look again at midpoint atc. After $ O(\log(2^q)) = O(q) $ iterations ($ \hat = $ one call to TSP$_{\text{DEC}}$ algorithm, one has found the opt. value for $ l^\ast $.
+	 
+\item Find an optimal tour (find a tour of length $ l^\ast$):
+
+We treat the entries $ d_{ij} $ of $ D $ separately (respectively the edges $( i, j )$). The idea is to check whether $ (i, j) $ is an edge needed in an optimal tour. Temporarily set $ d_{ij} $ to $ l^\ast + 1 $ (temporarily forbid the edge $ (i, j )$). Ask the question: Does there exist a tour with length $ l^\ast $ with respect to the current distance matrix?
+	\begin{itemize}
+	\item no $ \rightarrow $exery optimal tour contains $ (i, j) $. So reset the distance value to its old value and remember that $ (i, j) $ is part of the optimal tour.
+	\item yes $ \rightarrow $ leave $ d_{ij} $ at $ l^\ast + 1 $.
+	\end{itemize}
+After $ O(n^2) $ steps we have found a tour of length $ l^\ast $.
+\end{enumerate}
+
+Overall, a polynomial number of calls to a TSP$_{\text{DEC}}$ algorithm suffices.
+
+\subsection{FP and FNP}
+Let $ L \in NP $. Our goal is now to define the function problem $ FL $ associated with $ L $. For $ L \in NP $, there exists a binary relation $ R_L $ which is decidable in polynomial time and such that the following holds:
+$ \forall $ string $ x ~\exists $ string $ y $ s. t. $ (x, y \in R_L) \Leftrightarrow x \in L $. ($ R_L $ decribes certificate for ``yes''-instances)
+
+\paragraph{Definition:} Let $ L \in NP $. The problem $ FL $ is the following:
+\paragraph{Given:} String $ x $
+\paragraph{Task:} Find a string $ y $ such that $ x, y \in R_L $ or reply that no such $ y $ exists.
+
+$ FL $ is a ``generalisation'' of a decision problem.
+
+\paragraph{Definition:} FNP is the class of function problems associated with languages $ L \in NP $.
+
+\paragraph{Definition:} FP is the class of function problems associated with languages $ L \in P $.
+
+FP is a subclass of FNP.
+
+\subsubsection{Reduction of Decision Problems $ \rightarrow $ Extension to Functional Problems}
+
+\begin{tabular}{l c c c}
+& A & & B \\
+Input & x & $ \overset{R}{\longrightarrow} $ & R(x) \\
+& & & $ \downarrow $ \\
+Output & S(z) & $ \overset{S}{\longleftarrow} $ & z
+\end{tabular}
+
+\paragraph{Definition:} Let $ A $ and $ B $ be function problem. $ A $ is said to be reducible, if the following holds:
+$ \exists $ string functions $ R $ and $ S $ (both computable in polynomial time, alternatively one could require that both ate computable within logarithmic space), such that: If $ x $ is the input string of an instance $ I_A $ of problem $ A $, then $ R(x) $ is the input string of an instance $ I_B $ of problem $ B $. If $ z $ is a correct output for the instance $ I_B $, then $ S(z) $ is a correct output for the instance $ I_A $.
+
+\subsubsection{Completeness for Function Problem Classes}
+
+\paragraph{Definition:} A function problem $ A $ is called complete for the class $ FC $ of function problems if
+\begin{itemize}
+\item $ A \in FC $ and
+\item All problems in $ FC $ are reducible to $ A $.
+\end{itemize}
+
+Special case $ FNP$-completeness.
+
+One can easily show that FSAT is $ FNP $-complete. Similarly, one can show many results for $ FNP$-completeness for function problems which are associated with NP-complete decision problems.
+
+\subsection{Special Cases and Examples}
+
+Special class of function problems: those for which there always exists a $ y $ so that $ (x, y) \in R_L $. (The corresponding decision problem then is trivial.)
+
+\subsubsection{Factorisation of Natural Numbers}
+\paragraph{Given:} $ N \in \mathbb{N} $
+\paragraph{Task:} Decompose $ N $ into its prime factors.
+
+The corresponding decision problem is trivial. It is open whether there exists a polynomial time algorithm for factorisation.
+
+The example above motivates to define the class of total functions.
+
+\paragraph{Definition:} We call a problem $ L $ in FNP total if $ \forall $ strings $ x ~\exists $ string $ y $ such that$ (x, y) \in R_L $.
+
+TFNP (sub)class of all function problems associated with total functions.
+
+\subsubsection{Example 2}
+\paragraph{Given:} $ n $ numbers $ a, \dots, a_n \in \mathbb{Z}^+ $ such that $ \sum \limits_{i = 1}^h a_i < 2^n - 1 ~~ (\star)$
+\paragraph{Task:} Find $ I , J \subseteq \{1, \dots, n\}, I \neq J $ such that $ \sum \limits_{i \in I} a_i = \sum \limits_{j\in J} a_j$ (alternatively $ I \cap J = \varnothing $) or answer that no such $ I $ and $ J $ exist (One can show that due to $ (\star) $, the no case does not occur\footnote{pigeon hole principle of Schubfachschluss – there are $ 2^9 $ non-empty subsets and only $2^n-2$ possible values for the sums} $ \rightarrow $ example for a total function)
+
+Without $(\star)$, already the corresponding decision problem is NP-complete (subset sum, partition,...).
+
+\subsubsection{Happy Net}
+\paragraph{Given:} undirected graph $ G = (V, E) $. Edge weights $ w_e \in \mathbb{Z} $ for all $ e \in E $. A state function $ S $ is a function $ V \rightarrow \{+1, -1\} $. A vertex $ i \in V $ is called happy with respect to a state function $ S $ if the following holds:
+\[ S (i) \cdot \sum \limits_{i, j \in E} S(j) w_{ij} \geq 0 \]
+
+Happy Net Problem: Find a state (function) $ S $ sucht that all vertices are happy.
+\paragraph{Claim: } There always exists an $ S $ such that all vertices are happy $ \rightarrow $ total function
+
+No polynomial time algorithm for HAPPYNET is known.
+
+\begin{proof}
+$ \Phi (s) := \sum \limits_{(i, j) \in E} s(i) s(j) w_{ij} $
+
+Suppose vertex $ i $ is not happy with respect to $ S $ i.e. $ S(i) \cdot \sum \limits_{(i, j)} S(j) w_{ij} < 0 = - \delta $ where $ \delta > 0 $.
+
+Under the assumption that $ w_e \in \mathbb{Z} $, one can deduce $ \delta \geq 1 $ (for rational case adapt).
+
+We move from $ S $ to a new state $ S' $ such that $ S' (j) := S (j) $ and $ S' (i) := - S (i)$, $ \forall j \neq i $ (flip the state of $ i $) 
+
+One could easily check that $ \Phi (S') = \Phi (S) + 2 \delta \Rightarrow $ the potential function increases in each such step by $ \geq $ 2.
+
+This suggests the following algorithm:
+\begin{enumerate}
+\item start with an arbitrary initial state
+\item as long as there are unhappy vertices, choose one and flip its state
+\end{enumerate}
+Since $ \phi $ can take only values from $ [-W, W] $ with $ W = \sum \limits_{(i, j) \in E} |w_{ij}| $ and since $ \phi $ increases by $ \geq 2 $ after each flip, the above algorithm terminates with a solution to HAPPYNET in a finite number of steps.
+
+The running time $ O(W) $ is not polynomial in input size.
+\end{proof}
+
+\subsubsection{Example 4: Confer Problem 6 in exercises}
+
+
+%%% "2.2 About the complexity of opt. problems"
+\subsection{DP: Difference Polynomial}
+\paragraph{Definition:} $ L \in DP \overset{\text{Def.}}{\Rightarrow} \exists $ languages $ L_1 \in $ NP and $ L_2 \in $ Co-NP such that $ L = L_1 \cap L_2 $.
+
+\paragraph{Remark:} DP $ \neq $ NP $ \cap $ Co-NP (DP is much larger than NP $ \cap $ Co-NP)
+
+\subsection{Motivating Example: Exact-TSP $ \in $ DP}
+4 variants:
+\begin{enumerate}
+\item TSP$_{\text{DEC}}$.
+
+	\textbf{Given:} $ n \times n $ matrix $ D $, bound $ c^\ast $.
+	
+	\textbf{Question:} Does opt. tour have length $ \leq c^\ast $?
+\item EXACT-TSP
+
+	\textbf{Given:} $ n \times n $ matrix $ D $, value $ c^\ast $.
+	
+	\textbf{Question:} Does opt. tour have length $ c^\ast $?
+\item TSP-COST
+
+	\textbf{Given:} $ n \times n $ matrix $ D $
+	
+	\textbf{Task:} Determine length of optimal tour
+\item TSP
+
+	\textbf{Given:} $ n \times n $ matrix $ D $
+	
+	\textbf{Task:} Find an optimal tour
+\end{enumerate}
+All four versions are polynomially equivalent.
+
+\subsubsection{Example 1: EXACT-TSP}
+
+EXACT-TSP $ \in DP $ because the question whether $ \exists $ tour with length $ = c^\ast $ can be split up into a $ \geq c^\ast $ question of ``Co-NP type'' and $ \leq c^\ast $ question of ``NP type''
+
+\begin{theorem}
+EXACT-TSP $ \in $ DP-complete.
+\end{theorem}
+%% the theorem was introduced after the second example
+
+\begin{proof} (sketch)
+\begin{enumerate}
+\item
+	EXACT-TSP $ \in $ DP already argued
+\item
+	EXACT-TSP  $ \in $ DP-complete:
+
+	Reduction from SAT-UNSAT, starting point is the classical reduction from 3-SAT to the Hamiltonian cycle (path) problem.
+	
+	We construct two graphs $ G $ and $ G' $ from the two 3-SAT formulas $ \Phi $ and $ \Phi' $ such that $ G $ respectively $ G' $ contain a Hamiltonian path $ \Leftrightarrow $ $ \Phi $ respectively $ \Phi' $ are satisfiable.
+\end{enumerate}
+\end{proof}
+	
+\subsubsection{Example 2: SAT-UNSAT}
+
+\begin{theorem}
+SAT-UNSAT $ \in $ DP-complete
+\end{theorem}
+
+\paragraph{Given:} SAT formulas $ \Phi $ and $ \Phi' $
+\paragraph{Question:} Is $ \Phi $ satisfiable and is $ \Phi' $ non-satisfiable?
+
+\begin{enumerate}
+\item SAT-UNSAT $ \in $ DP
+
+	$ L_1 = \{ (\Phi, \Phi') : \Phi $ is satisfiable $ \} \in $ NP, since SAT $ \in $ NP (use Cook's Theorem)
+	
+	$ L_2 = \{ (\Phi, \Phi') : \Phi' $ is not satisfiable $ \} \in $ Co-NP, since Co-SAT $ \in $ Co-NP
+	
+	SAT-UNSAT $ = L_1 \cap L_2 $
+\item Let $ L \in $ DP. We need to show that $ L $ can be reduced to SAT-UNSAT.
+
+$ L \in $ DP, i.e. $ \exists L_1 \in $ NP, $ L_2 \in $ Co-NP such that $ L = L_1 \cap L_2 $
+
+$ \Rightarrow \exists $ reduction $ R_1 $ from $ L_1 $ to SAT
+
+$ \Rightarrow \exists $ reduction $ R_2 $ from $ L_2 $ to SAT
+
+We build up a reduction $ R $ with $ R (x) = (R_1(x), R_2(x)) $ from $ L $ to SAT-UNSAT such that $ R(x) $ is yes-instance of SAT-UNSAT $ \Leftrightarrow R_1(x) $ is satisfiable and $ R_2(x) $ is not satisfiable $ \Leftrightarrow x \in L_1 $ and $ x \in L_2 \Leftrightarrow x \in L $
+\end{enumerate}
+
+The basic idea of the reduction from 3-SAT to Hamiltonian path:
+\paragraph{Given:} 3-SAT formula $ \Phi $ with variables $ x_1, \dots, x_n $ and clauses $ c_1, \dots, c_m $.
+
+Construct a graph $ G = R(\Phi ) $ such that $ G $ contains a Hamiltonian path $ \Leftrightarrow \Phi $ is satisfiable.
+
+Our construction with different types of gadgets. One choice gadget per variable.
+
+
+
+%%% Figure
+
+Consistency gadget
+
+
+%%% Figure
+\begin{figure}
+	\centering
+	\psmatrix[emnode=circle,mnode=circle]
+	[fillstyle=solid,fillcolor=black] x & & & & & [fillstyle=solid,fillcolor=black] x \\
+	[mnode=none] & & & & \\
+	[fillstyle=solid,fillcolor=black] x & & & & & [fillstyle=solid,fillcolor=black] x
+	
+	\ncline{1,1}{1,2}
+	\ncline{1,2}{1,3}
+	\ncline{1,3}{1,4}
+	\ncline{1,4}{1,5}
+	\ncline{1,5}{1,6}
+	
+	\ncline{2,2}{2,3}
+	\ncline{2,3}{2,4}
+	\ncline{2,4}{2,5}
+	
+	\ncline{3,1}{3,2}
+	\ncline{3,2}{3,3}
+	\ncline{3,3}{3,4}
+	\ncline{3,4}{3,5}
+	\ncline{3,5}{3,6}
+	
+	\ncline{1,2}{2,2}
+	\ncline{1,3}{2,3}
+	\ncline{1,4}{2,4}
+	\ncline{1,5}{2,5}
+	
+	\ncline{2,2}{3,2}
+	\ncline{2,3}{3,3}
+	\ncline{2,4}{3,4}
+	\ncline{2,5}{3,5}
+	
+	\ncarc[linecolor=red]{1,1}{1,2}^{\textcolor[rgb]{0.8,0,0}{Option 1}}
+	\ncarc[linecolor=red]{1,2}{2,2}
+	\ncarc[linecolor=red]{2,2}{3,2}
+	\ncarc[linecolor=red]{3,2}{3,3}
+	\ncarc[linecolor=red]{3,3}{2,3}
+	\ncarc[linecolor=red]{2,3}{1,3}
+	\ncarc[linecolor=red]{1,3}{1,4}
+	\ncarc[linecolor=red]{1,4}{2,4}
+	\ncarc[linecolor=red]{2,4}{3,4}
+	\ncarc[linecolor=red]{3,4}{3,5}
+	\ncarc[linecolor=red]{3,5}{2,5}
+	\ncarc[linecolor=red]{2,5}{1,5}
+	\ncarc[linecolor=red]{1,5}{1,6}
+	
+	\ncarc[linecolor=blue]{3,1}{3,2}_{\textcolor[rgb]{0,0,0.8}{Option 2}}
+	\ncarc[linecolor=blue]{3,2}{2,2}
+	\ncarc[linecolor=blue]{2,2}{1,2}
+	\ncarc[linecolor=blue]{1,2}{1,3}
+	\ncarc[linecolor=blue]{1,3}{2,3}
+	\ncarc[linecolor=blue]{2,3}{3,3}
+	\ncarc[linecolor=blue]{3,3}{3,4}
+	\ncarc[linecolor=blue]{3,4}{2,4}
+	\ncarc[linecolor=blue]{2,4}{1,4}
+	\ncarc[linecolor=blue]{1,4}{1,5}
+	\ncarc[linecolor=blue]{1,5}{2,5}
+	\ncarc[linecolor=blue]{2,5}{3,5}
+	\ncarc[linecolor=blue]{3,5}{3,6}
+	\endpsmatrix
+	
+	\caption{Consistency Gadget}
+	\label{fig:consistencyGadget}
+\end{figure}
+
+the inner nodes only appear in the gadget $ \rightarrow $ 2 ways of inserting this gadget into a Hamiltonian path. Only one can be used – implements exclusive or. Short-hand notation: %% Figure
+
+How about the clauses?
+
+Clause gadget %% Figure
+
+We assume that each clause contains exactly 3 literals. The consistency gadgets are used to make sure that we cannot cheat and use $ x_i = $ true in clause $ c_j $ and $ x_i = $ false in clause $ c_k $.
+
+Our graph $ G $ contains $ n $ copies of the choice gadget, one for each variable, connected in series
+
+%% Figure
+
+Example $ (x_1 \vee x_2 \vee x_3 ) \wedge (\bar x_1 \vee \bar x_2 \vee \bar x_3 ) \wedge (\bar x_1 \vee \bar x_2 \vee x_3 ) $
+
+All $ 3m $ triangle nodes and the last node of the series connection of choice gadgets and the new vertex 3 are linked by all possible edges (complete subgraph) + introduce new vertex 2 and link it to 3
+
+This concludes the construction $ \Phi \rightarrow G = R( \Phi )$.
+
+Major claim: $ \Phi $ is satisfiable $ \Leftrightarrow G $ contains a Hamiltonian path. Proof: exercise (This will be a path between vertices 1 and 2).
+
+The novel part of our construction will be such that $ G $ and $ G' $ contain a so-called broken Hamiltonian path\footnote{$ \hat = $ two disjoint paths that cover all nodes, ``one edge missing''} and that a Hamiltonian path exists iff the corresponding formula is satisfiable.
+
+The broken Hamiltonian path corresponds to an almost satisfying truth assignment, i.e. an assignment that satisfies all clauses except one. To achieve this, we modify our SAT formula: add a new variable $ z $ and add $ z $ to all clauses (in unnegated form) and add the new clause $ \bar z $ (this can be transformed to 3SAT-instance).
+
+Given an instance $( \Phi, \Phi' )$ of SAT-UNSAT, we apply the machinery from above to construct two graphs $ G $ and $ G' $ which contain broken Hamiltonian paths and have a Ham. path $ \Leftrightarrow $ corresponding formula is satisfiable.
+
+%%% Figure
+
+Identify 1 of $ G $ and 2 of $ G' $, 2 of $ G $ and 1 of $ G' $
+
+
+Based on this graph we now define distances:
+
+Set $ d_{ij} = \begin{pmatrix}
+	1 & \text{if \{i, j \} is an edge in } G \text{ or } G' \\
+	2 & \text{if \{i, j \} is not an edge in } G \text{ but } i \text{ and } j \text{ are nodes in } G' \\
+	3 & \text{otherwise}
+	\end{pmatrix} $
+	
+\paragraph{Question:} What is the length of an optimal tour?
+Two cases:
+\begin{enumerate}
+\item
+	$ \Phi $ and $ \Phi' $ are satisfiable $ \rightarrow G $ and $ G' $ contain Ham. paths $ P_1 $ and $ P_2 $ which together form tour for our graph, all tour edges have weight 1. Cost of $ \tilde n $ is the number of nodes.
+\item
+	$ \Phi $ and $ \Phi' $ are not satisfiable. 2 broken Ham. paths. Cost to repair the 2 breaks is +1 (edge of cost 2 instead of cost 1). +2 $ \rightarrow $ total $ \tilde n + 3 $ (edge of cost 3 instead of 1)
+\item
+	$ \Phi $ is satisfiable and $ \Phi' $ is not satisfiable. optimal value $ \tilde n + 2 $
+\item
+	$ \Phi $ is not satisfiable and $ \Phi' $ is satisfiable. optimal value $ \tilde n + 1 $
+\end{enumerate}
+
+Use $ d^\ast = \tilde n + 2 $ for the EXACT-TSP instance.
+
+Many further NP-hard opt. problems lead to DP-complete problems when one looks at the corresponding EXACT version. This shows that DP is a kind of natural class for EXACT problems.
+
+Another such class are \textit{critical problems}.
+
+%% this still belongs to the dp section?
+\subsection{Critical problems}
+
+Critical SAT, Critical Hamiltonian path, Critical 3-Colorability are DP-complete
+
+\subsubsection{CRITICAL SAT}
+\paragraph{Given:} SAT formula $ \Phi $
+\paragraph{Question:} Is it true that $ \Phi $ is not satisfiable, but by removing an arbitrary clause, we end up with a satisfiable formula?
+
+\subsubsection{Critical Hamiltonian path}
+\paragraph{Given:} Undirected graph $ G = (V, E) $
+\paragraph{Question:} Is it true that G does not contain a Hamiltonian path, but by adding an arbitrary new edge, we end up with a Hamiltonian path.
+
+\subsubsection{UNIQUE SAT}
+\paragraph{Given:} SAT formula $ \Phi $
+\paragraph{Question:} Does there exist a unique satisfying assignment? (only one possible)
+
+It is unknown whether UNIQUE-SAT $ \in $ DP-complete.
+
+\subsection{A step towards the polynomial hierarchy}
+Another way to look at DP: We are allowed to call once a SAT oracle and to call once a Co-SAT oracle ($ \equiv $ 2 SAT oracle calls).
+
+$ \rightarrow $ Idea: allow a \textit{polynomial} number of calls to a SAT oracle
+
+$ \rightarrow $ leads to the concept of a so-called Oracle Turing Machine
+
+\paragraph{Definition:} A TM $M^?$ with an oracle is a TM with a special string (the so-called query string) which corresponds to a call to the oracle and 3 special states (in addition to the standard TM concept):
+\begin{itemize}
+\item $ q_? $ state which corresponds to call of oracle
+\item $ q_{YES} $ state corresponding to ``YES'' answer from the oracle call
+\item $ q_{NO} $ state corresponding to ``NO'' answer from the oracle call
+\end{itemize}
+
+Let $ A \subseteq \Sigma ^\ast $ be a language. $M^? $ with oracle A runs like a classical TM except for state transitions from the query state.
+
+$ M^A(x)$: apply the oracle TM $M^?$ with oracle $ A $ to input $ x $. Instead of using single languages we also allow classes of languages.
+
+One of the classes we will be interested in will be what we denote by P$^\text{SAT}$ (generalization of DP). We consider oracle TM which use a polynomial number of steps (= ordinary steps + calls to the SAT oracle).
+
+As (3SAT) SAT is a representative for NP-complete problems (hardest problems in NP), P$^\text{SAT}$ is the same as P$^\text{NP}$
+
+Analogously, once can define FP$^\text{NP}$.
+
+\paragraph{Question:} Are there FP$^\text{NP}$-complete problems?
+
+\subsubsection{MAX OUTPUT}
+
+\paragraph{Given:} non deterministic TM $ N $, with input $ 1^n $ (string of $ n $ times 1). $ N $ behaves such that it stops for this input after $ O(n) $ steps and produces a binary string of length $ n $ as output.
+
+\paragraph{Task:} Determine the largest output of $ N $ (seen as a binary number)
+
+\begin{theorem}
+MAX OUTPUT $ \in $ FP$^{\text{NP}}$-complete.
+\end{theorem}
+
+\begin{proof} (Sketch)
+
+\begin{enumerate}
+\item[i.]
+	MAX OUTPUT  $ \in $ FP$^{\text{NP}}$.
+
+	Use binary search, iteratively ask whether $ \exists $ output $ \geq x $, ($ x $ in decimal system from $ 0, \dots, 2^{n} - 1 $) $ \rightarrow $ in $ O(n) $ steps we get the value of the largest output (correpsonds to calls to an NP oracle $ \rightarrow $ MAX OUTPUT $ \in $ FP$^{\text{NP}}$
+\item[ii.]
+	MAX OUTPUT $ \in $ FP$^{\text{NP}}$-COMPLETE.
+	
+	%% essential here: F in FP^NP
+	Let $ F $ be a function mapping string to strings with $ F \in $ FP$^{\text{NP}}$. $ \Rightarrow \exists $ oracle TM $ N^? $ which can evaluate $ F $ in a polynomial number of steps, i.e. M$^{\text{NP}}(x) = $ M$^{\text{SAT}} = F(x)$.
+	
+	To show the above completeness, we need a reduction from $ F $ to MAX OUTPUT.
+	
+	input $ F \overset{R}{\longrightarrow} R(x) $
+	
+	solution $ f(R(x)) \overset{S}{\longleftarrow} F(x) $
+	
+	\begin{enumerate}
+	\item $ R $ and $ S $ are computble within logarithmic space
+	\item $ \forall $ string $ x $, $ R(x) $ is the input for a MAX OUTPUT  instance
+	\item $ S $ applied to the output for the MAX OUTPUT  instance with input $ R(x) $ delivers $ F(x)$
+	\end{enumerate}
+	
+	Construction of $ R $
+	
+	We need to construct a non-deterministic TM $ N $ and a string $ 1^n $. We set $ n = p^2(|x|) $ where $ |x| $ is the encoding length of $ x $ and $ p() $ is the polynomial bound for the number of steps performed by M$^{\text{SAT}}$. Informally, $ n $ is set large enough to allow us to simulate M$^{\text{SAT}}$.
+	
+	$ N $ starts with the input $ 1^n $ and generates generates the beginning $ x $ as a string and then simulates M$^{\text{SAT}} $ on $ x $. This simulation will work in a deterministic way. Except for oracle calls, $ N $ can do the same as M$^{\text{SAT}}$. Suppose we arrive at the the first oracle call (question whether a SAT formula $ \Phi_1 $ ($\Phi_i$) is satisfiable, in general at the $i$-th oracle call). $ N $ guesses the answer to the question and sets $ z_1 = 1 $ ($ z_i = 1 $) if the guesses answer is yes and $ z_1 = 0 $ ($ z_i = 0 $) otherwise. If $ z_i = 0$, $ N $ proceeds with the state $ q_{NO} $.
+	
+	If $ z_i = 1 $, $ N $ guesses a truth assignment $ T_i $ for the variables in $ \Phi_i $. Next, $ N $ checks whether $ T_i $ satisfies $ \Phi_i $. If this is the case, $ N $ proceeds with state $ q_{YES} $. Otherwise, $ N $ ``gives up'', i. e. outputs $ 0^n $ and stops (non-successful computation).
+	
+	In case that $ N $ does not stop prematurely, it writes the string $ z_1, z_2, z_3, \dots $ on the output band and fills the remaining positions with zeros in order to get an output string of length $ n $ and finally adds the output of M$^\text{SAT}(x)$, i. e. $ F(x) $ (refer to this as successful computation).
+	
+	$ N $ is a non-deterministic TM. Some of the successful computations are wrong computations of M$^\text{SAT}(x)$ ($ \Phi_i $ can be satisfiable and $ N $ can proceed with $ z_i = 0 $. For $ z_i = 1 $, the simulation is always correct if successful).
+	
+	Key observation: The successful computation that delivers the largest output corresponds to a correct simulation of M$^\text{SAT}(x)$.
+	
+	Proof of the observation: Suppose that in a successful computation which delivers the max. output we have $ z_j = 0$, but $ \Phi_i $ satisfiable (one source of mistake) and let $ j $ be minimal with this property. There needs to exist another successful computation which coincides with the considered up to the $ j$-th oracle call, but then shows $ p_j = 1 $ and finds a satisfying assignment $ T_j $ and such that all further oracle calls are simulated correctly.
+	
+	Contradiction to the fact that the original successful computation provided the max. output.
+	
+	Concluding, $ N $ solves the MAX OUTPUT problem. $ N $ can be constructed within logarithmic space, $ S $ is trivial since $ F(x) $ has been written on the output band.
+\end{enumerate}
+
+\end{proof}
+
+\subsubsection{MAX-WEIGHT SAT}
+\paragraph{Given:} A SAT formula with variables $ x_i, \dots x_n $ and clauses $ C_i, \dots, c_m $. Each of the clauses $ c_j $ is assigned an integer weight $ w_j $.
+
+\paragraph{Task:} Find a truth assignment such that the total weight (sum of weights) of all satisfied clauses is maximized (satisfiability not required).
+
+\begin{theorem}
+MAX-WEIGHT SAT  $ \in $ FP$^\text{NP}(x)$-complete.
+\end{theorem}
+
+\begin{proof} (Sketch)
+\begin{enumerate}
+\item[i.] MAX-WEIGHT SAT $ \in $ FP$^\text{NP}(x)$: use binary search and SAT oracle $ \rightarrow $ provides the largest possible weight and then do variable fixing as in FSAT
+\item[ii.] We use the techniques from the proof of Cooks theorem (This proof constructs from a non-deterministic TM and an input of $ 1^n $ a SAT formula $ \Phi (N, n)$ such that each satisfying truth assignment for $ \Phi $ corresponds to (successful) computations of $ N $
+\end{enumerate}
+\end{proof}
+
+
+\subsection{Polynomial...}
+Missing: 27 and 29 October
+%%%%%% Letzte Oktoberwoche
+\begin{theorem}
+\end{theorem}
+\begin{theorem}
+\end{theorem}
+\begin{theorem}
+\end{theorem}
+\begin{theorem}
+\end{theorem}
+\begin{theorem}
+\end{theorem}
+\begin{theorem}
+\end{theorem}
+\begin{theorem}
+\end{theorem}
+\begin{theorem}
+\end{theorem}
+
+%%% 5. November
+\paragraph{Comment:} another example for $ \Sigma_i P$-complete problems comes from multilevel programming (bilevel, three-level)
+\begin{itemize}
+\item each of the decision makers have his own decision functions, constraints and variables
+\item The leader starts to make a decision, in order to obtain a function value for his objective function, he depends on his follower's objective function
+\item assume that the follower chooses the worst situation for the leader
+\item you can show that these problems are complete, depending on the number of decision makers you introduce
+\end{itemize}
+
+%% 2.13
+\begin{theorem}
+If there existed a PH-complete problem, the polynomial hierarchy would collapse at a finite level.
+\end{theorem}
+
+\begin{proof}
+Assume L PH-complete $ \Rightarrow \exists i \geq 0: L \in \Sigma_i P \Rightarrow $ each language $ L' \in \Sigma_{i + 1}$P can be reduced to $ L $. Since all levels of PH are closed with respect to reductions, we get $ L' \in \Sigma_i $P $ \Rightarrow \Sigma_{i + 1} $P $ = \Sigma_i $ P.
+\end{proof}
+
+It is unknown whether PH-complete problems exist.
+
+\begin{theorem}
+PH $ \subseteq $ PSPACE (without proof here)
+% not polynomial time but polynomial space (memory)
+\end{theorem}
+
+Conjecture: PH $ \neq $ PSPACE
+
+\paragraph{Remarks:}
+\begin{enumerate}
+\item Quantified Boolean formula problem $ Q_1 x_1 Q_2 x_2 \dots Q_k x_k ~~ \Phi(x_1, \dots x_n) $: log. formula free of quantors. $ Q_i \in \{ \forall, \exists \} $ is a known PSPACE-complete problem
+\item When defining $ \Sigma_i $ P and $ \Pi_i $ P via alternating oracle TMs, one needs to assume that $ i $, the number of quantors is not part of input $ \rightarrow $ in PSPACE, there is no restriction on the number of quantors
+\item Since there exist PSPACE-complete problems, the existence of PH-complete problemts would imply the collapse of the polynomial hierarchy.
+\end{enumerate}
+
+\begin{theorem}
+BPP $ \subseteq \Sigma_2 $P
+\end{theorem}
+
+\begin{proof}
+Let $ L \in $ BPP $ \Rightarrow \exists $ TM $ M $ with calculations of length $ p(n) $ (p polynomial) for inputs of length $ w $ sucht that $ M $ decides $ L $ by majority vote (prob. for false answers $ \leq \frac{1}{4} $
+
+For each input $ x $ of length $ n $ denote by $ A (x) \in \{0,1\}^{p(n)} $ the set of accepting computations. We can assume that $ \forall x \in L |A(x)| \geq 2^{p(n)} (1 - \frac{1}{2^n} $ (repeat such that error probability $ \leq {1}{2^n} \forall x \not \in L | A(x) | \leq \frac{1}{2^n} \cdot 2^{p(n)} $
+
+\end{proof}
+
+\paragraph{Definition} $ a, b \in U $, $ a XOR b $ (bitwise XOR operation)
+
+\paragraph{Observations}
+\begin{itemize}
+\item $ a XOR b = c \Leftrightarrow c XOR b = a $
+\item $ (a XOR b) XOR b = a \rightarrow $ ``XOR $ b $'' provides a 1 to 1 mapping
+\item $ a \in U $ fixed, $ r \in U $ random $ \rightarrow a XOR r $ random
+\end{itemize}
+
+\paragraph{Definition:} translation $ t \in U $, $ A(x) XOR t:= \{ a XOR t | a \in A(x) $ translation of $ A(x) $ by $ t \} $
+
+
+
+%%% section level check: complexity classes in subsections, not subsubsections
+
+Theorem BPP $ \subseteq \Sigma $ P %%% se above
+
+%$ A(x) $ set of accepted computations of TM $ M $ on input $ \hat $ translation $ t \in U $ (bit of strings of length $ p(n) $)
+
+$ A(x) \oplus t := \{ a (+ ) t | \hat \subset A(x) \} $ (bitwise xor)
+
+From properties of $ \oplus $ we get $ |A(x) \oplus t| = |A(x)| \forall t \in U $
+
+%%%%
+
+be a random sequence of $ p(n) $ translations ($p^2(n) $ random bits)
+
+Now consider $ b \in U $, arbitrary but fixed. We say that $ b $ is covered by $ t_1, \dots , t_{p(n)} $ if $ \exists j \in \{ 1, \dots, p(n) \} $ such that $ b \in A(x) \oplus t_j $.
+
+\paragraph{Question:} What is the probability that b is covered by $ t_1 \dots t_p(n) $?
+$ b \in A(x) \oplus t_j \overset{\Leftrightarrow}{prop (i) of \oplus} b (+= t_j \in A(x) $ ($t_j $ random, right sight: prop (iii) --  random has same distribution as $ t_j $)
+
+Recall that we can assume $ \forall x \in L | A(x) | \geq 2^{p(n)} (1 - \frac{1}{2^n}, \forall x \not \in L |A(x)| \leq \frac{1}{2^n} \dot ....$%%%% 
+
+Since $ x \in  $, we have that prob($b \not \in A(x) \oplus t_j ) \leq \frac{1}{2^n} = 2^{-n} $ (follows from ([])).
+$ \rightarrow $ probability that $ b $ is not covered by any the $ t_j $ is $ \leq 2^{-np(n)} $
+
+$ \Rightarrow $ each element of $ U $ is not covered with prob $ \leq 2^{-np(n)} $
+
+$ \Rightarrow $ the prob. that then $ \exists $ element in $ U $ that is not covered is $ \leq 2^{-n(pn)}. |U| = 2^{-(n-1)p(n)} << 1 $
+
+$ \Rightarrow $ A sequence of $ p(n) $ random translations covers all of $ U $ with high probability.
+
+Assume now $ x \not \in L. $ Now $ A(x) $ contains an exponentially small part of $ U $. This implies that for large enough $ n $ there cannot exist a sequence of p(n) translations that cover all of U.
+
+Resume: $ x \in L \Leftrightarrow \exists $ sequence of $ p(n) $ translations that cover $ U $
+
+$ L = \{ x: \exists T = (t_1, \dots t_{p(n)} ) \in \{ 0, 1 \}^{p(n)} $
+
+$ \forall b \in U: \exists j \in \{ 1, \dots, p(n)\} $ sucht tha $ b \oplus t_j \in A(x)\} $
+
+The last $ \exists $ quantor can be reformulated to $ (b (x) t_1 \in A(x)) \vee (b \oplus t_2 \in A(x) \vee \dots \vee $ %%%%
+
+can be checked in polyn. time $ \rightarrow \Sigma_2$ char. results $ \rightarrow L \in \Sigma_2 P $
+
+\paragraph{Remark:} BPP is closed with respect to complement $ BPP \subseteq \Sigma_2 P \cap \Pi_2 P $
+
+\section{Complexity of Counting (Problems)}
+
+We are interested in the number of solutions to a problem, or more precisely in the complexity of these counting problems.
+
+\subsection{Examples}
+
+\subsubsection{\#SAT}
+
+\paragraph{Given:} SAT formula $ \Phi $
+\paragraph{Task:} Find the number of satisfying truth assignments for $ \Phi $
+
+There exist numerous similar problems which come from problems where the associated decision problem is NP-complete such as \#HAMILTONIAN CYCLES/PATHS etc.
+
+\subsubsection{\#MATCHING (PERMANENT)}
+
+%%% include matching example
+
+\paragraph{Given:} Bipartite graph $ G = (U \cup V, E), U = \{u_1, \dots, u_n\}, V = \{v_1, \dots, v_n\} $
+
+\paragraph{Task:} Find the number of perfect matchings (1 to 1 assignments in $ U $ and $ V $) in $ G $. Perfect matching corresponds to $ \Pi \in S_n $, where $ S_n $ is a permutation on $ \{ 1, \dots, n \} $
+
+Associate with $ G $ its adjacency matrix $ A(G) = a_{ij} $ with $ a_{ij} = \left\{ \begin{array}{ll} 1 & u_{i, v_j} \in E \\ 0 & \text{otherwise} \end{array} \right. $
+
+$ \Pi \in S_n $ describes a perfect matching in $ G  \Leftrightarrow \{ u_i, v_{\Pi(i)}\} \in E \forall i \in \{ 1 \dots, n \} \Leftrightarrow a_{i \Pi(i)} = 1 \forall i \in \{ 1 \dots, n \} \Leftrightarrow \prod \limits_{i = 1}^n a_{i\Pi(i)} = 1 $
+
+Remark: perm(A) looks similar to $ \det(A) $
+
+$ \Rightarrow \sharp $ perfect matchings $ = \sum \limits_{\Pi \in S_n} \prod \limits_{i - 1}^n a_i \Pi (i) $ (permanent of A, perm(A), permanent is defined for general matrices)
+= $ \sum \limits_{\pi \in S_n} (-1)^{sgn(\Pi)} \prod \limits_{i=1}^n a_{i \Pi(i)} $
+
+There exists an efficient polynomial time algorithm for computing $ \det(A) $ but most probably not for perm$(A)$ even in the 0 -1  case
+
+Note that deciding whether there exists a perfect matching is an easy problem.
+
+\subsubsection{Example 3}
+
+\paragraph{Given:} graph with $ m $ edges and $ n $ vertices
+\paragraph{Task:} Find the number of subgraphs of $ G $ (overall there are $ 2^m $ subgraphs) which contain a path from 1 to $ n $.
+
+Of interest in reliability questions.
+
+\subsection{\#P}
+
+Let $ Q $ be a polynomial balanced binary relation which is checkable in polynomial time. Now we associate the following counting problem to $ Q $:
+
+\paragraph{Given:} $ x $
+\paragraph{Task:} Find the number of $ y $ with $ (x, y) \in Q $.
+
+\#P is the class of counting problems which are associated with such relations $ Q $.
+
+All counting problems considered in our chapter are from the set $ \sharp $P
+
+\paragraph{Question:} Do there exist $ \sharp $P-complete problems?. Attention: we need an appropriate reduction notion here.
+
+Counting problems are special functional problems.
+
+\begin{figure}{htb}
+%%%
+\caption{Reduction}
+\end{figure}
+
+For defining $ \sharp$P-completeness there exist (among others) the following two approaches:
+\begin{enumerate}
+\item Use the reduction notion defined for functional problems. We need a function $ S $ which determines the number of solutions of problem $ A $ when given the number of solutions of problem $ B $.
+
+A very popular subclass of such reductions (parsimonious) arises when the number of solutions is preserved ($ S = $ ident)
+\item In formal idea  $ A $ is a function problem if it is $ \sharp$P-complete, if problem is in $ \sharp $P and if the existence of a polynomial time algorithm for the computation of $ f $ would imply $ \sharp$P = FP.
+
+For formal version, extend the notion of an oracle TM $ M $ to functional problems. We provide $ M $ with access to an oracle for $ f: \{0, 1 \}^\ast \rightarrow \{0, 1 \}^k $ (for $ f: \{0, 1 \}^\ast \rightarrow \mathbb{N} $ using binary format. $ M $ has access to the language $ L = \{(x, i): f(x)_i = 1 \}$) ($ i-th $ bit)
+For $ f $ refer to FP $ f $ as the set of functions which can be computed with a polynomial oracle TM with access to $ f $.
+
+Function $ f $ is $ \sharp $P-complete if $ F \in \sharp $ P and if $ \forall y \in \sharp $P $y \in$ FP$^f $ (Obviously $ f \in $ FP, FP$^f$ = FP)
+\end{enumerate}
+
+
+\begin{theorem}
+Let $ f \in $ \#P-complete and $ f \in $ FP $ \Rightarrow $ FP = \#P.
+\end{theorem}
+
+\begin{theorem}
+\#SAT $ \in $ \#P-complete.
+\end{theorem}
+
+\begin{proof} (Sketch)
+Consider the proof of theorem of Cook: provides a reduction from an arbitrary language $ L $ onto SAT $ \rightarrow $ it provides a function $ f $ computable in polynomial time. $ f : \{0, 1\}^\ast \rightarrow \{0, 1\}^\ast $
+
+$ f(x) \in $ SAT $ \Leftrightarrow x \in L $ (``$ \in $ SAT'': yes instance of SAT)
+
+The proof does not only provide $ f $ but also a method which transforms a certificate for $ x \in L $ to a certificate for $ f(x) \in $ SAT (set of satisfiable SAT formulas)
+
+$ \rightarrow $ We have a bijection between yes instances $ \rightarrow $ parsimonious reduction.
+
+obviously \#SAT $\in $ \#P
+
+% parsimonious: you can use the identity function for the reduction function S
+\end{proof}
+
+\begin{theorem}
+\#HAMILTONIAN PATHS/CYCLES $ \in $ \#P-complete.
+\end{theorem}
+
+\begin{theorem}
+PERMANENT (\#MATCHING) $ \in $ \#P-complete.
+\end{theorem}
+
+\begin{proof} (Sketch, some steps omitted, not required in the exam)
+Our goal is a \#P-completeness result for comp. permanent of 0-1 matrices. We take a detour via more general matrices.
+
+\begin{enumerate}
+\item For 0-1 matrixes $ A $: perm(A) = \# perf. matchings in graph $ G(A) $, bipartite graph associated with $ A $.
+
+\item For matrices A with entries from $ \{ 0, \pm 1\} $: one can easily prove that perm(A) = $ |\Pi \in S_n: \prod \limits_{i=1}^n a_{i\Pi(i)} = 1\}| - |\Pi \in S_n: \prod \limits_{i=1}^n a_{i\Pi(i)} = -1\}| $ (cardinalities)
+
+($ \rightarrow $ 2 \#SAT calls suffice)
+
+\item Let $ A $ be an $ n \times n $ matrix with integers as entries. Consider $ A $ as a weighted adjacency matrix of the directed, complete graph $ K_n $ (but directed and continues loops) with $ V = \{ v_1, \dots , v_n \} $
+%% Figure of complete graph (*)
+
+Use the cycle representation of $ \Pi \in S_n $.
+
+%%% Figure (**)
+
+\begin{tabular}{c | c c c c}
+& 1 & 2 & 3 & 4 \\
+\hline
+$ \Pi $ & 3 & 1 & 2 & 4 \\
+\end{tabular}
+
+Observation: each permutation $ \Pi \in S_n $ corresponds to a cycle cover in $ G(A) $ (a set of directed cycle in $ G(A) $ such that each vertex is contained in exactly one cycle)
+
+Next define the weight of the cycle cover as the product of the weights of the included arcs.
+
+$ \rightarrow $ perm(A) = sum of the weights of all cycle covers. With this construction one can show that computing the permanent for an integer matrix $ x $ is in FP$^{\text{\#SAT}}$
+
+\item
+
+Reduction from \#3SAT to PERMANENT
+
+In the remaining part of the proof, edges with weight 0 are not drawn (all involved graphs are complete). The weight of a cycle cover which contains such an edge is 0 (see definition of weight above). We will first allow parallel edges (we can get rid of this). See Figure \ref{fig:coverweights}
+
+%%% figure weights, cycle
+\begin{figure}
+\centering
+\psmatrix[mnode=circle]
+$\cdot$ & $\cdot$ &  [mnode=none]  $\longrightarrow $  & $\cdot$ & $\cdot$ & $\cdot$
+\ncarc[arrows=->]{1,1}{1,2}
+\naput{1}
+\ncarc[arrows=->]{1,2}{1,1}
+\naput{$ w $}
+\ncline{1,4}{1,5}
+\naput{1}
+\ncline{1,5}{1,6}
+\naput{$ w $}
+\endpsmatrix
+\caption{Weights of cycle covers}
+\label{fig:coverweights}
+\end{figure}
+
+Consider the following graph $ G $ which splits into the following 2 parts (2nd: vertex disjoint): Figure \ref{fig:cyclegraph}
+
+%%% figure graph
+\begin{figure}
+\centering
+\psmatrix[mnode=circle]
+& $\cdot$ & & $ ~~~G'~~~ $\\
+$ \cdot$ & & $\cdot$
+\ncarc[linecolor=blue,arrows=->]{1,2}{2,1}
+\naput{+1}
+\ncarc[linecolor=red,arrows=->]{2,1}{1,2}
+\naput{-1}
+\ncarc[linecolor=red,arrows=->]{1,2}{2,3}
+\naput{+1}
+\ncarc[linecolor=blue,arrows=->]{2,3}{1,2}
+\naput{-1}
+\ncarc[linecolor=blue,arrows=->]{2,1}{2,3}
+\naput{+1}
+\ncarc[linecolor=red,arrows=->]{2,3}{2,1}
+\naput{-1}
+\endpsmatrix
+\caption{Weights}
+\label{fig:cyclegraph}
+\end{figure}
+
+Observe that there exist exactly 2 cycle covers in the left subgraph which have non-zero weight. One of them has weight 1 and the other one the weight -1.
+
+To any cycle cover of weight $ w $ in $ G' $, we get two cycle covers of the whole of $ G $, one with weight $ w $ and the others with weight $ -w \rightarrow $ the permanent of $ A (G) $ is 0.
+
+In order to prove Valiant's theorem, we will reduce the \#P-complete \#SAT problem to PERMANENT.
+
+Let $ \Phi $ be a 3SAT formula with $ n $ variables $ x_1, \dots, x_n $ and $ m $ clauses. First, we will show how to construct an integer matrix (or equivalently a weighted directed graph $ G $) such that perm($A(\tilde G)) = 4^{3m} \cdot \# \Phi $, with $ \# \Phi $ denoting the number of satisfying truth assignments for $ \Phi $. The ocmputation of the integer matrix is \#P-complete.
+
+This matrix will not be a 0-1 matrix, we will take care of this issue later.
+
+Similarly to the the idea in the simple example above, we will make use of negative weights to ensure that the contribution of cycle covers that do not correspond to satisfying assignments cancel out. For each satisfying assignment we want to have the contribution $ 4^{3m} \rightarrow $ leads to $ (\star) $.
+
+To construct $ \tilde G $, we combine three types of gadgets (variable gadgets, clause gadgets, XOR gadgets). There is a variable gadget per variable, a clause gadget per clause
+
+\begin{figure}
+\centering
+
+\psmatrix[mnode=circle]
+& & $\cdot$\\
+$ u $ & & & & $ u' $ \\
+& $\cdot$ & & $\cdot$ \\
+$ v' $ & & & & $ v $ \\
+& & $\cdot$
+
+\nccircle[arrows=<-]{1,3}{.5cm}
+\naput{-1}
+\nccircle[arrows=<-]{5,3}{.5cm}
+
+\ncline[arrows=->]{2,1}{3,2}
+\ncline[arrows=->]{3,2}{4,1}
+\ncline[arrows=->]{3,2}{3,4}
+\naput{-1}
+\ncline[arrows=->]{3,4}{2,5}
+\ncline[arrows=->]{4,5}{3,4}
+
+\ncarc[arrows=->]{3,2}{1,3}
+\ncarc[arrows=->]{1,3}{3,2}
+\ncarc[arrows=->]{3,4}{1,3}
+\ncarc[arrows=->]{1,3}{3,4}
+
+\ncarc[arrows=<-]{5,3}{3,2}
+\naput{-1}
+\ncarc[arrows=<-]{3,4}{5,3}
+\naput{2}
+\ncarc[arrows=<-]{5,3}{3,4}
+\naput{3}
+
+\ncarc[arrows=->]{1,3}{5,3}
+\ncarc[arrows=->]{5,3}{1,3}
+\endpsmatrix
+
+\caption{XOR gadget}
+\label{fig:XORgadget}
+
+\end{figure}
+
+
+\paragraph{XOR Gadget:} see Figure \ref{fig:XORgadget}. Edges with no indicated weight have weight 1.
+
+\[ D= \begin{pmatrix} 0 & 1 & -1 & -1 \\ 1 & -1 & 1 & 1 \\ 0 & 1 & 1 & 2 \\ 0 & 1 & 3 & 0 \end{pmatrix}\]
+
+One can explicitly check that
+\begin{itemize}
+\item[a] perm$(D) = 0$
+\item[b1] perm$(D') = 0$ where $ D' $ results from $ D $ by deleting the first column and first row.
+\item[b2] last instead of first
+\item[b3] if first and last rows and columns are deleted
+\item[c] perm $(D'') = 4 $ where $ P'' $ results from deleting the first row and last column (or the last row and first column)
+\end{itemize}
+Note: the first and last columns are the ones which contain zero entries.
+
+The idea behind the XOR gadget is that, given a weighted directed graph $ H $, we want to ensure that for some pair of directed edges $ (u, u') $ and $ (v, v')$, exactly one of these edges is contained in any cycle cover that contributes to the final sum.
+
+Every cycle cover of $ H $ of weight $ w $ that uses exactly one of the edges $ (u, u') $ and $ (v, v') $ is mapped to a cycle cover in a graph $ H' $ whose total weight is $ 4w$ (i.e. the set of covers that enter the gadget at $ u $ and exit at $ u' $ or enter at $ v $ and exit at $ v' $) while all cycle covers of $ H' $ have total weight 0 (details as exercise).
+
+Variable gadget: has both internal (only contained in this gadget) and external edges (will be connected via XOR gadgets to other edges in the graph). We split the external edges into ``true'' and ``false'' edges
+
+The variable gadget as only 2 cycle tokens (correspond to selling this variable to 0 or 1)
+
+0: using all ``false'' external edges, 1: using all ``true'' external edges + all other vertices will be covered by loops.
+
+\paragraph{Variable gadgets}
+%% figure variable gadget
+Each external edge of a variable gadget is associated with a clause in which this variable appears. It is associated with a true edge, if the variable appears in this clause unnegated, false otherwise.
+
+\paragraph{Clause gadget}
+%%% figure clause gadget
+
+Each external edge is connected via an XOR gadget with the external edge of the variable gadget which corresponds to this external edge of the clause gadget.
+
+Observation: the only possible cycle covers of the clause gadget are those which omit at least one external edge.
+
+Moreover, it can be checked that for each proper subset of the external edges there exists a unique cycle cover of weight 1 that contains them.
+
+Overall:
+%% figure overall
+
+Analysis of the construction:
+Since each variable gadget has exactly two cycle covers (one for $ x_i = 1 $, one for $ x_i = 0 $), there is a one-to-one correspondence between assignments to the variable $ \overrightarrow x = x_1, \dots, x_n $ and the cycle covers in $ \tilde G $ which covers the variable gadgets. For every assignment $ \overrightarrow x $ let $ C_{\overrightarrow x} $ denote the set of cycle covers in $ \tilde G $ that cover the variable gadgets according to $ \overrightarrow x $.
+
+That means: we cover variable $ x_i $'s gadgets using the ``true'' external edges if $ x_i = 1 $ and cover it by the ``false'' external edges otherwise.
+
+Let $ w(\overrightarrow x) $ denote the total weight of assignments in $ C_{\overrightarrow x} $. It suffices to show that $ w(x) = 4^{3m} $ if $ x $ is a satisfying assignment and $ w (\overrightarrow x = ) 0 $ else.
+
+To prove this, we argue as follows: By the properties of the XOR-gadget and the remaining construction we know the following:
+
+If $ x_i = 1 $, then in cycle covers in $ C_{\overrightarrow x} $, the corresponding external edge has to be omitted in the gadget of every clause that contains $ x_i $ positively and it has to be included for clauses which contain $ x_i $ negatively.
+
+For $ x_i = 0$, reverse include/omit. (All other covers do not contribute to final sum).
+
+Since every cover of the clause gadget has to omit at least one external edge, we see that unless every clause has a literal that evaluates to true in $ \overrightarrow x $ (i. e. unless $ \overrightarrow x $ satisfies $ \Phi $), the total weight of covers in $ C_{\overrightarrow x} $ will be zero. If $ \overrightarrow x $ does satisfy $ \Phi $, then the total weight will be $ 4^{3m} $ (since $ \overrightarrow x $ determines a unique cycle cover for all clause gadgets that passes through XOR gadget exactly $ 3 m $ times).
+
+
+\item It remains to reduce to the 0-1 case. The essential question is how to deal with the -1 entries. Also to be answered: how to deal with entries with 1, $ 1 \neq 1 $ entries %%% ??
+The transformation works in 2 steps. First, we reduce from the integer case to $ \{0,\pm 1\} $ and then to $ \{0,1\} $.
+
+Suppose we have an edge with a weight being a power of 2, say $ 2^k $. Then we can replace this edge by a path of $ k $ edges (consisting of new nodes, not connected of something else), each of weight 2. An edge of weight $ 2^k + 2^{k'} $ by two parallel paths with weights $ 2^k $ and $ 2^{k'} $. By using binary expansion %% Binärdarstellung der Zahl
+$ \rightarrow $ set of paths with corresponding weights. The total number of nodes in these paths is quadratic in the number of bits needed to represent the original weight. $ \rightarrow O(L^2) $ new nodes.
+
+To get rid of the negative weights, we use modular arithmetic.
+
+For $ 0, \pm 1 $ matrixes $ n \times n $ A, we know that perm$(A) \leq n!$ and $ -n! \leq $ perm$(A)$
+
+We choose $ M = n^2 $ and then take everything mod $2^M + 1 $
+
+$ -1 \equiv 2^M (mod 2^M + 1) $, so we can replace the -1 weights by $ 2^M $ weights. %% that is, neq 0, 1
+Apply construction before (construction of polynomial size) $ \rightarrow $ subgraph of size $ 0(M^2) $
+
+
+\end{enumerate}
+\end{proof}
+
+%% lost this somewhere
+%% perm(A) $ \sum \limits_{\Pi \in S_n} \prod \limits_{i = 1}^n a_{i \Pi(i)} $
+
+\subsection{Approximately Counting the Number of Solutions}
+
+\paragraph{Remark:} One can also deal with the question of approximately counting the number of solutions. $ \alpha $-approximation for $ 0 < \alpha < 1 $. Algorithm $ A $ delivers an $ \alpha$-approximation for $ f : \{0, 1\}^t \rightarrow No $. if $ \alpha \cdot f(x) \leq A(X) \leq \frac{f(x)}{\alpha} \forall x $, where $ A(x) $ is the result of $ A $. There are \#P-complete problems for which even determining an $ \alpha $-approximation for the number of solutions is a hard problem for constant $ \alpha > 0 $. There are problems for which $ \alpha $-approximation counting is easier/easy.
+
+For the 0-1 PERMANENT problem, there exists FPRAS (fully polynomial randomized approximation scheme).
+
+$ \rightarrow $ algorithm which for given $ \varepsilon > 0 $ and $ \delta > 0 $we get an $(1 - \varepsilon)$ approximation for the function $ f $ we want to determine which works correctly with probability $ 1 - \delta $ (it might fail with probability $ \delta $) and has polynomial running time $ p(n, log \frac{1}{\delta}, \log \frac{1}{\varepsilon}) $, with $ n $ being the coding length of the input.
+
+\paragraph{Comment:} If P = NP, then each problem in \# P would have a FPRAS and even an FPTAS (deterministic, no mistake, see last part of course).
+
+\paragraph{Question:} How powerful is counting?
+
+Since problems in \#P can be solved within polynomial space (e.g. by lexicographic enumeration), \#P is not more mighty than PSPACE.
+
+Now compare PH and \#P.
+% PH: polynomial Hierarchy
+
+\begin{theorem} (Theorem of Toda, without proof)
+
+PH $ \subseteq $ P$^{\text{\#P}}$ = P$^{\text{\#SAT}}$.
+
+\end{theorem}
+
+$ \rightarrow $ We can solve each problem from the polynomial hierarchy by making use of a polynomial number of calls to a \#P(-complete)/\#SAT oracle.
+
+Informally: ``Counting is more powerful than the polynomial hierarchy''
+
+\paragraph{Remark:} one can show that if \#P = FP $ \Rightarrow $ NP = P and PH = P.
+
+\paragraph{Comment:} There is a relation between PP\footnote{Underlying question of PP\footnote{here we want to know all bits}: are more than half of the computations accepting?} and \#P. $ \rightarrow $ interest in the leading (first) bit of the numbers of accepting computations (when including leading zeros).
+
+Idea: What about if we are interested only in the last bit? $ \rightarrow $ We only focus on the parity: even/odd $ \rightarrow $ motivation for +P (spoken: parity P, odd P).
+
+\subsection{+P}
+A language $ L $ is in +P, if there exists a polyn. TM $ M $ s.t. $ \forall $ strings $ x $ we get $ x \in L \Leftrightarrow $ \# of accepting computations of $ M $ on $ x $ is odd.
+
+Equivalently: $ \exists $ polynomial balanced relation $ R $ s.t. $ x \in L \Leftrightarrow $ \# of $y $'s s.t. $ (x, y) \in R $ is odd.
+
+\subsubsection{Example: +SAT}
+\paragraph{Given:} SAT formula $ \Phi $
+
+\paragraph{Question:} Is the \# of satisfying truth assignments odd?
+
+\begin{theorem}
+
++SAt is $\oplus$P-complete
+
+\end{theorem}
+
+(Proof relies on standard techniques.)
+
+Similarly we get that +HAM PATH/CYCLES is +P-complete
+
+\paragraph{Question:} Is +MATCHING +P-complete?
+
+No: this problem is solvable in polynomial time by computing the determinant of the matrix associated with our bipartite graph.
+
+\begin{theorem}
++P is closed with respect to complement
+\end{theorem}
+
+\begin{theorem}
+NP $ \subseteq $ RP$^{\oplus P} $
+\end{theorem}
+
+\begin{proof}
+
+We will construct a polynomial Monte Carlo algorithm for SAT which uses a $\oplus$SAT oracle. Let a SAT formula $ \Phi $ in variables $ x_1, \dots, x_n $ be given.
+
+\paragraph{Definition:} Let $ S \subseteq \{1, \dots, n \} $
+
+Hyperplane $ \eta_S $: The boolean expression which requires that an even number of variables with indices from the set $ S $ have value true.
+
+Let $ y_0, y_1, \dots, y_n $ be new variables. $ \eta_S $ can be obtained as follows: Take the conjunction of the following clauses $ (y_0), (y_n) $ and for all $ i \in \{1, \dots, n \} $, we add the clause $ \tilde C_i $ with
+
+$ \tilde C_i : y_i \Leftrightarrow (y_{i - 1} \oplus x_i) $ if $ i \in S $
+
+$ \tilde C_i : y_i \Leftrightarrow y_{i - 1} $ if $ i \not \in S $
+
+$ \tilde C_i $ can be transformed to the usual SAT normal form.
+
+Our Monte Carlo algorithm now works as follows:
+
+Start with $ \Phi_0 = \Phi $ (the given SAT formula)
+
+For $ i := 1 $ to $ n $ do:
+
+generate randomly a set $ S_i \subseteq \{ 1, \dots, n \} $ and set $ \Phi_i := \Phi_{i - 1} \wedge \eta_{S_i} $. Apply the +SAT oracle to $ \Phi_i $.
+
+If $ \Phi_i \in $ +SAT, then $ \Phi $ is satisfiable. Answer ``yes'' and stop.
+
+Otherwise, answer ``probably no'', ``no''. \medskip
+
+Claim 1: the algorithm above is indeed a MC-algorithm
+
+Proof of Claim 1:
+\begin{enumerate}
+\item We don't have false positives. If $ \Phi_i $ has $ \geq 1 $ satisfying assignment, $ \Phi $ has at least one.
+\item Probability for false negative?
+
+	Claim 2: Prob(false negatives) $ \leq \frac{7}{8} $ (repeat 6 times $ \rightarrow \leq \frac{1}{2}$
+	
+	Proof of Claim 2:
+	
+	Central observation: If the number of satisfying assignments for $ \Phi $ is between $ 2^k $ and $1^{k + 1} (0 \leq k < n) $ with $ k \in \mathbb{N} $, then the probability that $ \Phi_{k + 1} $ has exactly one satisfying assignment is $ \geq \frac{1}{8} $
+	
+	Proof of the central observation:
+	
+	Let $ T $ be the set of satisfying assignments for $ \Phi $. Suppose $ 2^k \leq |T| \leq 2^{k + 1} $. We say that two truth assignments coincide on a hyperplane $ \eta_S $ if they both satisfy $ \eta_S $ or they both violate it.
+	
+	Let $ t \in T $ (fixed). Consider $ \hat t \in T $. Prob$( t $ and $ \hat t $ coincide on the first $ k + 2 $ hyperplanes $(\eta_{S_1}, \dots, \eta_{s_{k+2}})) = \frac{1}{2^{k+2}} $ (since this would mean that all $ k + 2 $ sets $ S_1, \dots, S_{k + 2} $ contain an even number of variables, where $ t $ and $ \hat t $ disagree and all these events are independent and arise with probability $ \frac{1}{2} $.
+	
+	Summing up over all $ \hat t \in T \backslash \{ t \} $. $ \rightarrow $ probability that $ t $ agrees with some $ \hat t \in T \backslash \{ t \} $ on the first $ k + 2 $ hyperplanes $ \leq \frac{|T| - 1}{2^{k+1}} < \frac{1}{2} $ by assign. on $ | T | $ on the first $ k + 2 $ hyperplanes is $ \geq \frac{1}{2} $.
+	
+	The probability that $ t $ satisfies all first $ k + 2 $ hyperplanes is $ \frac{1}{2^{k + 2}} $.
+	
+	We know that if it satisfies them, then with probability $ \geq \frac{1}{2} $, it is the only one that does (the fact that $ t $ satisfies the first $ k + 2 $ hyperplanes does not affect the probability that it disagrees with the rest of $ T $).
+	
+	$ \Rightarrow $ with probability $ \geq \frac{1}{2^{k + 3}} = \frac{1}{2} \cdot \frac{1}{2^{k + 2}} $, $ t $ is the unique satisfying assignment for $ \Phi_{k + 2} $. This holds for all $ t \in T $ and $ T $ has $ \geq 2^k $ elements $ \Rightarrow $ The probability that such a suitable element exists is at least $ 2^k \cdot \frac{1}{2^{k + 3}} = \frac{1}{8} $.
+	
+	If the number of satisfying assignments for $ \Phi $ is $ \neq 0 $, then there exists a $ k < n, k \in \mathbb{N}_0 $, such that this number is between $ 2^k $ and $ 2^{k + 1} \Rightarrow $ At least one of the $ \Phi_i's $ will have probability at least $ \frac{1}{8} $ to be satisfied by a unique truth assignment and thus an odd number.
+
+\end{enumerate}
+\end{proof}
+
+\section{Interactive Protocols}
+
+\subsection{Introduction and Definitions}
+
+two roles/persons who interact:
+\begin{itemize}
+\item the prover
+\item the verifier
+\end{itemize}
+
+They communicate/exchange messages or information. The prover wants to convince the verifier that his proof is correct. In the end, it is the task of the verifier to either accept or reject the proof.
+
+\paragraph{Key Decision:} How much power do the prover and the verifier have?
+
+\subsubsection{Variant 1}
+Assume both prover and verifier are deterministic (i. e. act deterministically)
+	
+Exchange of messages: \\ function $ f, g : \{ 0, 1 \}^\ast \rightarrow \{ 0,1\}^\ast $ for $ k \in \mathbb{N}_0 $ (which may depend on the input length) and $ x $ as the input known both to prover and verifier. $ k $ round interaction between prover and verifier is a sequence of strings $ a_1, \dots, a_k \in \{0, 1\}^\ast $ such that
+\begin{itemize}
+	\item $ a_1 = f(x) $
+	\item $ a_2 = g(x, a_1) $
+	\item $ a_{2i + 1} = f(x_1, a_1, \dots, a_{2i}) $ for $ 2_i < k $
+	\item $ a_{2i + 2} = g(x_1, a_1, \dots, a_{2i + 1}) $ for $ 2_{i + 1} < k $
+\end{itemize}
+	
+The output at the end of the interaction is denoted by $ out_f (f, g)(x) $ defined as $ f(x, a_1, \dots, a_k) $ and we assume that the output is from $ \{ 0, 1 \} $ (0: rejection, 1: acceptance).
+	
+\paragraph{Deterministic proof system:} We say that a language $ L $ has a $ k $ round deterministic interactive proof system if there is a deterministic TM $ V $ (verifier) that on input $ x, a_1, \dots a_k $ runs in polynomial time in the $ | x | $ and can have a $ k $ round interaction with any function $ P $ such that
+	
+\begin{itemize}
+	\item (Completeness) $ x \in L \Rightarrow \exists P: \{0, 1\}^\ast \rightarrow \{0, 1\}^\ast  out_V(V, P)(x) = 1 $
+	\item (Soundness) $ x \not \in L \Rightarrow \forall P: \{0, 1\}^\ast \rightarrow \{0, 1\}^\ast out_V(V, P)(x) = 0 $
+	%% if there is e.g. no Hamiltonian cycle, the prover cannot convincingly say that there is one
+\end{itemize}
+
+%% example: two rooms, secret door in between. prover can convincingly say that he knows the secret for passing without saying what it is by entering room 2 from room 1.
+	
+$ \rightarrow $ dIP (deterministic interactive protocol) is the class of all languages with a $ k $ round deterministic proof system where $ k(n) $ is polynomial in $ n $.
+	
+\paragraph{Comments:} No restrictions are made on the power of prover $ P $ (intuitively, this makes sense as a wrong proof needs to be rejected also if the proof is very clever) $ \rightarrow $ we could eliminate the dependence of $ P $ on $ x $ (exercise).
+
+One can prove that dIP does not give as anything new.
+
+\begin{lemma}
+dIP = NP
+\end{lemma}
+(proof: exercise)
+
+This negative experience suggests to allow the verifier to act like a randomized algorithm $ \rightarrow $ the verifier is allowed to make mistakes, but the error probability should be limited in a meaningful way.
+
+\subsubsection{Variant 2}
+
+This leads to the complexity class IP.
+
+%% interesting point here: more powerful prover
+\begin{itemize}
+\item Verifier: has randomised polynomial time available (rand. polyn. algorithm).
+\item Prover: has exponential computing time available, deterministic has exponential computation time available, deterministic suffices. It already suffices to provide the prover with PSPACE power.
+\end{itemize}
+
+Again, we can come up with the concept of a $ k $ round exchange protocol but now \textit{random bits} enter the game for the verifier.
+
+In the IP concept, the random bits of the verifier are assumed to be known only to the verifier (``private random bits'' as opposed to so-called public random bits). Again, the prover and the verifier exchange messages, but now the mesages of the verifier are allowed to depend also on the verifier's random bits. The output of the protocols is now a random variable.
+
+\paragraph{Probabilistic verification and the class IP}
+For an integer $ k \geq 1 $ (that may depend on $ | x | $), we say that a language $ L $ is in IP[$k$] or IP($k$) if there exists a probabilistic polynomial TM (or alternatively a BPP algorithm) $ V $ such that we can have a $ k $ round interaction with a function $ P : \{ 0, 1\}^\ast \rightarrow \{0, 1\}^\ast $ such that
+\begin{itemize}
+\item (Completeness) $ x \in L \Rightarrow \exists P: \{0, 1\}^\ast \rightarrow \{0, 1\}^\ast: \mathbb{P}[out_V(V, P)(x) = 1] \geq \frac{3}{4} $
+\item (Soundness) $ x \not \in L \Rightarrow P: \{0, 1\}^\ast \rightarrow \{0, 1\}^\ast : \mathbb{P}[out_V(V, P)(x) = 1] \leq \frac{1}{4} $\footnote{note: the probabilities do not have to sum up to 1!}
+\end{itemize}
+
+\paragraph{Comments:}
+\begin{itemize}
+\item The probability is with respect to $ r $, the vector of random bits of $ V $, but this is typically omitted from the notation.
+
+\item IP $ = \bigcup $ IP $ [n^c] $ all what we get our new concept with a polynomial number of rounds
+
+\item The bounds $ \frac{3}{4} $ and $ \frac{1}{4} $ can be made arbitrarily close to 1 and 0 respectively by the same ``boosting'' technique as for BPP
+\end{itemize}
+
+One can show the following:
+
+\begin{lemma}
+The class IP defined above remains unchanged if we replace $ \frac{3}{4} $ by $ 1 - 2^{-n^s} $ and $ \frac{1}{4} $ by $ 2^{-n^s} $ for any fixed constant $ s > 0 $.
+\end{lemma}
+(Proof uses repetitions, Chernoff bounds)
+
+\paragraph{Comments}
+\begin{itemize}
+\item One can easily show that providing the prover with randomisation does not provide anything new. We still get IP (by averaging: deterministic prover that makes the prover accept with the same probability)
+\item Since the prover can use an arbitrary function, it could use, in principle, even unbounded computation time or even compute undecidable functions. However, one can show that given any verifier $ V $, we can compute the optimum prover (which, given $ x $, maximises the verifier's acceptance probability) using polynomial $ p(|x|) $ space $ \rightarrow $ PSPACE (and thus $ 2^{(p|x|)} $ exponential time) $ \rightarrow $ IP $ \subseteq $ PSPACE.
+\item Replacing the constant $ \frac{3}{4} $ by 1 in the completeness condition does not change the class IP. This is a non-trivial result (the first proof was quite complicated, there are easier proofs now which still require work).
+\item By contrast, changing $ \frac{1}{4} $ to 0 in the soundness condition does not yield IP, but just NP (Variant 1)\footnote{if 0, the prover can never trick the verifier}.
+\item In the IP concept we make use of private random bits $ \rightarrow $ alternative name: notion of private coin interactive proofs. In contrast, there exists the related concept of public random bits (coins) $ \rightarrow $ public coin interactive proofs or Arthur - Merlin proofs
+\end{itemize}
+
+\subsection{The Graph Isomorphism Problem, its Complement and Interactive Protocol}
+
+Graph isomorphism problem (GI)
+
+\paragraph{Given:} 2 undirected graphs $ G_0 = (V_0, E_0) $ and $ G_1 = (V_1, E_1) $.
+
+$ n = | V_0 | = | V_1 | $, $ m = | E_0 | = | E_1 | $.
+
+\paragraph{Question:} Are $ G_0 $ and $ G_1 $ isomorphic ($ G_0 \cong sign G_1 $)?
+
+$ \overline{\text{GI}} $ graph non-isomorqphism
+
+\paragraph{Question:} Are $ G_0 $ and $ G_1 $ not isomorphic? (see Figure \ref{fig:isomorph})
+
+\begin{figure}[htb]
+
+\psmatrix[mnode=circle]
+
+1 & 2 & & 2 & 4 \\
+2 & 5 & [mnode=none]$ \cong $ & 1 & 4 \\
+3 & 6 & & 6 & 5
+
+\ncline{1,1}{2,2}
+\ncline{1,2}{2,1}
+\ncline{2,1}{3,1}
+
+\ncline{1,4}{2,5}
+\ncline{1,5}{2,4}
+\ncline{2,4}{3,4}
+
+\endpsmatrix
+
+\caption{Isomorphic Graphs $ G_0 $ and $ G_1 $}
+\label{fig:isomorph}
+
+\end{figure}
+
+$ \Pi  \begin{pmatrix}
+1 & 2 & 3 & 4 & 5 & 6 \\
+2 & 1 & 6 & 3 & 4 & 5
+\end{pmatrix} $ \medskip
+
+Obviously we have GI $ \in $ NP and thus GI $ \in $ IP(1). It is open whether GI is NP-complete (but for certain reasons it is unlikely that GI is NP-complete)
+
+\paragraph{Question:} What about $ \overline{\text{GI}} $? Answer: $ \overline{\text{GI}} \in $ IP(2)
+
+Interactive protocol for GI
+
+Verifier V: Pick a random bit $i \in {0,1}$. Permute the vertices of $G_i$ randomly by a (random) permutation $\pi \in S_n$ and let $ H = \pi(G_i) $. Send $H$ to the prover.
+
+Prover P: Identify which of $G_0$ or $G_1$ was used to produce $H$. Let $G_i$ be such a graph (if $G_0 \cong G_1$ either answer is correct). Send bit $j \in {0,1}$ to V.
+
+Verifier V: 
+Accept if $i=j$
+Rejects if $i \neq j$
+
+It is easy to see, that if $G_0 \ncong G_1$ P can always enforce that V accepts. If $G_0 \cong G_1$, then $Prob[V accepts] = \frac{1}{2}$, 2 repititions $ \leq \frac{1}{4}$
+
+We have just proven that Theorem 4.3 $ \overline{\text{GI}} \in $ IP(2)
+
+Comment: This protocol heavily relies on the fact that the random bits of V are private. AM[K] results from IP(K) if the random bits of the verifier are public. Obviously $AM[K] \subseteq IP(K)$. AM is named by Artur Merlin and it is using public random bits. One can show
+
+Theorem (Goldwasser, Sipser)
+$IP(K) \subseteq AM[k+2]$
+This theorem would suggest an $AM[4]$ protocol for $ \overline{\text{GI}} $. There is even an $AM[2]$ protocol for the $ \overline{\text{GI}} $.
+
+What's behind this protocol will be dealed with in an exercise (on sheet 3).
+
+Consider there the set S of labeled graphs $S=\{(H,\pi): H \cong G_0 $ or $ H \cong G_1\}$ The cardinality of S is different for the 2 cases:
+$G_0 \cong G_1$
+$G_0 \ncong G_1$
+
+Question: Can GI be NP-complete?
+There is no definite answer, but the following is known:
+Theorem If GI is NP-complete, then $\Sigma_2 P = \Pi_2 P$. (The polynomial hierarchy caollapses at level 2)
+Proof: as exercise
+
+Question: How powerful is IP?
+Of course, $NP \subseteq IP \subseteq PSPACE$. It was conjectured that $IP \subset PSPACE$, but it turned out to be wrong.
+Answer:
+Theorem 4.6 (Shamir) $IP = PSPACE$
+The idea for the proof will given later in the lecture.
+
+\subsection{Interactive protocols with the zero knowledge property(ZKP)}
+Perfect ZKP and some weaker versions play an important role in applications, in particular in cryptography.
+prover Bob, Verifier Veronica
+Informally: Bob does not want to provide Veronica with any knowledge. He just wants to make her accept.(She can not obtain further knowledge on her own)
+For example, the following problem demonstarates: Given G, does there exist a hamiltonian cycle, Bob does not want to provide the hamiltonian cycle and still convince Veronica that there is a hamiltonian path.
+
+Example: Sketch of room: room 1 and 2 are connected by a secret door, and both have a door into the ante room which has one door to the outside. Bob claims to know the code of the secret door. He wants to convince Veronica that he knows the code without telling or demonstrating it to her.
+This can be achieved as follows:
+\begin{enumerate}
+\item At the beginning B and V are outside. Then B enters the ante room and closes the door. Bob chooses randomly a bit $i \in {0,1}$ and enters room $i$ and closes the door.
+\item Veronica enters the ante room and chooses bit $j \in {0,1}$ and tells it Bob.
+\item Bob comes out of one of the 2 rooms.
+\item Veronica accepts if Bob comes out of room $j$.
+
+Comment: By using the secret door, Bob always chooses the right room, which means he can make Veronica believe he knows the code. If he does not know the code, then there is a just chance of 2.
+It is easy to see that no information about the code is provided by Bob, thus it is an interactive protocol with the perfect zero knowledge property(PZKP).
+\end{enumerate}
+
+% 26.11.2014
+
+Our next goals:
+\begin{enumerate}
+\item provide a concise definition of PZK
+\item provide an interactive protocol for GI (Graph isomorphism) with PZK Prop.
+\end{enumerate}
+
+More formal: An interactive protocol is said to have the perfect zero knowledge property (PZKP) if the following holds:
+
+Assume that Veronica is not acting in a sincere manner and is executing some arbitrary algorithm $ V' $ instead of her standard algorithm $ V $ (her goal is to try to ``spy out'' the secret or parts of the secret)
+
+There is an efficient simulation algorithm which by communicating with Bob achieves the same distribution of messages as the protocol $ (B, v') $.
+\medskip
+
+Even more formal:
+
+Let $ L $ be a language from NP and let $ M $ be a polynomial TM such that $ x \in L \Rightarrow \exists y: M(x, y) = 1 $ where $ y $ is the polynomial certificate of polynomial length.
+
+A pair $ (P, V) $ of an interactive protocol ($ V $ is a prob. polyn. algorithm) is called a (perfect) zero knowledge proof for $ L $ if the following conditions hold:
+
+\begin{enumerate}
+\item Completeness:
+
+	$ \forall x \in L $ and $ u $ being a certificate for this fact (i. e. $ M(x, u) = 1$): Prob$(out_v (P(x, u), V(x,) = 1) \geq \frac{3}{4} $ where $ P(x, u), V(x) $ denotes the interaction of $ P $ and $ V $ where $ P $ gets $ x $ and $ u $ as input and $ V $ gets $ x $ as input and $ out_v I $ denotes the output (decision) of $ V $ at the end of interaction $ I $.
+	
+\item Soundness:
+
+	If $ x \not \subset L $ then $ \forall $ strategy $ P^\ast $ and input $ u $, Prob$( out_V P^\ast (x, u), V(x) = 1) = \Box \leq \frac{1}{4} $ perfect zero knowledge.
+	
+	For every prob. polyn. algorithm (statregy) $ V ^\ast $, there exists a prob. algorithm $ S^\ast $ (a stand-alone algorithm), whose expected running time is polynomial, such that $ \forall x \in L $ and $ u $ being a certificate for $ x \in L $ we have $ out_{V^\ast} (P(x, u), V^\ast(x)) \equiv S^\ast(x) $ (both sides are random variables, with identical distribution)
+	
+	I.e. these two random variables are identically distributed, even though $ S^\ast $ does not have access to a certificate for $ x $.
+	
+	The algorithm $ S^\ast $ is called simulator for $ V^\ast $ as it simulates the outcome of $ V^\ast $'s interaction with the prover.
+
+\end{enumerate}
+
+Zero knowledge property means that the verifier cannot learn anything new, not even by deviating from the standard protocol algorithm $ V $  and using $ V^\ast $ instead. (The same as from the interaction with $ P $ can be learnt by just applying $ S^\ast $.)
+
+\paragraph{Comments:}
+\begin{itemize}
+\item It does not influence the resulting concept that we ask only for expected polynomial running time for $ S^\ast $.
+\item Analogous definition can be set up for languages from sets $ \neq $ NP.
+\end{itemize}
+
+Now: PZK as class of languages for which there exists an interactive protocol (proof systems) with PZK property.
+
+\begin{theorem} GI $ \in $ PZK 
+\end{theorem}
+
+\begin{proof}
+
+We provide a PZK interactive protocol for GI Graphs $ G_0, G_1 $ are known to both prover $ P $ and verifier $ V $.
+
+If $ G_0 \cong G_1 $, then $ P $ further has access to a permutation $ \Pi \in S_n $ such that $ G_1 = \Pi (G_0 ) $.
+
+\begin{enumerate}
+\item Prover $ P $ chooses random permutation $ \Pi' \in S_n $ and sends the graph $ H = \Pi' (G_1) $ to the verifier. (e.g. by sending adjacency lists)
+\item Verifier chooses random bit $ b \in \{0, 1\} $ and sends it to the prover.
+\item The prover sends a permutation $ \tilde \Pi \in S_n $ to the verifier.
+	\begin{itemize}
+	\item If $ b = 1 $, the prover chooses $ \tilde \Pi = \Pi' $
+	\item If $ b = 0 $, the prover chooses $ \tilde \Pi = \Pi' \circ \Pi $ ($ \tilde \Pi(G_0) = \Pi' \circ \Pi(G_0) = \Pi' (G_0 ) = H $)
+	\end{itemize}
+
+\item The verifier accepts iff $ H = \tilde \pi (G_b) $.
+\end{enumerate}
+
+If both prover and verifier follow this protocol, then the verifier will accept if $ G_0 \cong G_1 $ with probability 1 ($ \rightarrow $ Completeness).
+
+For soundness: suppose $ G_0 \not \cong G_1 $. Then the verifier will reject with a probability $ \geq \frac{1}{2} $ (can be made larger by repetitions).
+
+(Regardless of the prover's strategy, the graph $ H $ which is sent in the first message cannot be isomorphic to both $ G_0 $ and $ G_1 $ and so there exists a $ b^\ast \in \{ 0, 1 \} $ such that $ H \not \cong G_{b^\ast} $. The verifier will choose $ b = b^\ast $ with probability $ \frac{1}{2} $ and then the prover i not able to find a permutation $ \tilde \Pi $ such that $ H = \tilde \Pi (G_b) $)
+\end{proof}
+
+\paragraph{Definition (Zero Knowledge):} Let $ V^\ast $ be an arbitrary verifier strategy. Consider the following simulation algorithm $ S^\ast $: On input $ G_0, G_1 $, $ S^\ast $ chooses bit $ b' \in \{0, 1 \} $ and a random permutation $ \Pi' \in S_n $ and computes $ H = \Pi' (G_{b}) $.
+
+Interesting case: $ G_0 \cong G_1 $ (otherwise there is no secret) $ \rightarrow $ assume this.
+
+Then $ S^\ast $ feeds $ H $ into $ V^\ast $ to obtain a bit $ b \in \{0, 1\} $. If $ b = b' $, then $ S^\ast $ sends $ \Pi' $ to $ V^\ast $ and outputs whatever $ V^\ast $ outputs.
+
+If $ b \neq b' $, then $ S^\ast $ restarts.
+
+\paragraph{Question:} How are the messages of $ S^\ast $ distributed?
+\paragraph{Answer:} They are distributed in exactly the same way as the prover's first message (a random graph that is isomorphic to both $ G_0 $ and $ G_1 $.
+
+This implies that $ H $ reveals nothing about the choice of $ b' $, hence the probability that $ b = b' $ is $ \frac{1}{2} $.
+
+In this case ($ b = b' $), the messages $ H $ and $ \Pi' $ that $ V^\ast $ sees are distributed in exactly the same way that it gets in the real interaction with prover.
+
+Because $ S^\ast $ succeeds in getting $ b = b' $ with probability $ \frac{1}{2} $, the probability that it needs $ k $ iterations is $ Z^{-k} $.
+
+$ \rightarrow $ the expected running time of $ S^\ast $ is $ T(n) \cdot \sum \limits_{k = 1}^\infty 2^{-k} = O(T(n)) ~\rightarrow S^\ast $ has expected polynomial running time. ($ T(n) $ is the running time of $ V^\ast $).
+
+
+\subsection{Weaker Zero Knowledge Property}
+We have now seen that there exist languages $ L \in $ NP such that $ L \in $ PZK.
+\paragraph{Question:} Do there exist PZK protocols for NP-complete problems? E.g. for Hamiltonian path/cycle?
+
+\paragraph{Answer:} Probably no, since the following can be shown: PZK $ \subseteq $ IP(2) $ \cap $ Co-IP(2)\footnote{for GI: GI $ \in $ IP(1) $ \in $ NP. $ \overline{\text{GI}} \in $ IP(2) $ \rightarrow $ GI $ \in $ Co-IP}.
+The existence of a PZK protocol for an NP-complete problem would imply $ \Sigma_2$P$ = \Pi_2 $P.
+
+$ \rightarrow $ Let's try to come up with a weaker concept of zero knowledge than the perfect zero knowledge property.
+
+\subsubsection{First attempt}
+Statistical zero knowledge property (SZK): here we only ask that the distribution generated by $ S^\ast $ and the one generated by the real protocol differ only in a neglectibally small manner ($ \varepsilon(n) $ is negl. small if $ \varepsilon(n) $ is superpolyn. small, i. e. $ \exists $ polyn. $ p $ such that $ \varepsilon(n) \leq \frac{1}{p(n)} $ for all sufficiently large $ n $).
+
+Unfortunately, the same result as for PZK holds for SZK with respect to NP-completeness.
+
+
+%% 1.12. TODO
+
+\subsection{Computational Zero Knowledge Property (CZK)}
+
+
+%% 10.12.
+
+The kind of CZK protocols for NP-complete problems exist under the assumption that one way functions exist (this is a stronger assumption than assuming P $ \neq $ NP).
+
+It is an open problem to decide whether the the assumption P $ \neq $ NP suffices. If P = NP, then such protocol cannot exist. $ \rightarrow $ relationship to concepts of (perfect) secrecy in cryptography.
+
+\subsubsection{Hamiltonian Circuit}
+
+\begin{theorem}
+
+There exists a CZK protocol for the Hamiltonian circuit problem HC.
+
+\end{theorem}
+
+\begin{proof}
+
+Consider the following interactive protocol:
+
+Let $ G = (V, E), | V | = n $ be the given undirected graph. Henceforth we assume that we have c (correct) bit commitment method.
+
+\begin{enumerate}
+\item Bob chooses a random permutation $ \Pi \in S_n $. Bob determines $ \Pi(G) $ (e.g. as edge lists).
+
+	Bob sends bit commitments for $ \Pi $ and $ \Pi(G) $.
+\item Veronica chooses randomly a bit, $ i \in \{0, 1\} $ and sends it to Bob.
+
+\item If $ i = 0 $, Bob has to uncover the bits for $ \Pi $ and $ \Pi(G) $.
+
+	If $ i = 1 $, Bob uncovers the bits of $ n $ edges of $ \Pi(G) $ ($ \equiv n $ edges of $ G $) such that if there exists a Hamiltonian circuit in $ G $ the uncovered edges form a Hamiltonian circuit. Otherwise he chooses the edges arbitrarily.
+	
+\item If $ i = 0$, Veronica accepts if Bob has not cheated in step 3, i.e. he uncovered a proper permutation $ \Pi' $ and the corresponding $ \Pi'(G) $, otherwise she rejects. If $ i = 1 $, Veronica accepts if Bob uncovered the edges of a Ham. circuit.
+\end{enumerate}
+
+Prove that this is an IP
+\begin{itemize}
+\item If $ G \in $ HC (i.e. $ G $ contains a Ham. circ.), Bob can always make Veronica accept. Error prob. 0
+\item If $ G \not \in $ HC, then Bob cannot pass the two tests for $ i = 0 $ and $ i = 1 $ at the same time, if he permutes the correct graph, he will pass the $ i = 0 $ test, but fail for $ i = 1 $. If he cheats with $ \Pi, \Pi(G) $, he can pass the test, but fails for the $ i = 0 $ test. $ \rightarrow $ error probability $ \frac{1}{2} ~ \rightarrow $ repeat 2 times $ \rightarrow $ error prob. $ \frac{1}{4} $.
+\end{itemize}
+
+Now: focus on the CZK property.
+
+Consider a protocol $ (B, V') $ and the following simulation algorithm $ S $ for Bob.
+
+\begin{enumerate}
+\item Choose randomly a bit $ i' \in \{0, 1 \} $ and continue with the hypothesis that the $ V' $ algorithm chooses $ i = i' $. If $ i' = 0 $, send bit commit
+\item Simulate $ V' $ for the data sent by Bob.
+\item If $ i \neq i' $, restart
+\item Simulate the action of Bob in step 3 of the interactive protocol
+	\begin{itemize}
+	\item $ \mathbb{P}[i = i'] = \frac{1}{2} ~ \rightarrow $ expected number of iterations in constant $ \rightarrow $ polyn. time
+	\item The distribution of the messages sent by the simulation algorithm $ S $ and by the protocol $ (B, V') $ should be distinguishable within polynomial time only with neglectibly small probability
+	\end{itemize}
+\end{enumerate}
+Formal proof: exercise
+
+\end{proof}
+
+\subsubsection{3-Colourability}
+Another example for an interactive protocol for an NP-complete problem with CZK property
+
+\paragraph{Given:} undirected graph $ G = (V, E) $, $ | V | = n $
+\paragraph{Task:} find a 3-colouring of $ G $: $ \Phi: V \rightarrow \{1, 2, 3\} $ such that $ \{i, j \} \in E \Rightarrow \Phi(i) \neq \Phi(j) $
+
+Consider the following protocol:
+\begin{enumerate}
+\item Bob chooses randomly a permutation $ \tau \in S_3 $ (permutation of colour set). For $ i = 1 $ to $ n $, Bob sends bit commitments for $ \tau(\Phi(i)) $
+
+Comment: if Bob knows a 3-colouring, he chooses $ Phi $ as an arbitrary $ \Phi : V \rightarrow \{1, 2, 3\} $
+
+\item Veronica chooses randomly an edge $ e (= \{i, j\}) \in E $ and sends it to Bob.
+
+\item Bob needs to uncover the values sent for $ i $ and $ j $.
+
+\item Veronica checks whether the two colours assigned to $ i $ and $ j $ are different and accepts if this is the case and rejects otherwise
+\end{enumerate}
+
+Again, if the $ G \in $ 3COL, then Bob will always make Veronica accept.
+
+If $ G \not \in $ 3COL, Veronica catches a cheating Bob with a small probability if the protocol is used only once.
+
+It can be shown that by repeating this process $ r \times | E | $ times, the error probability is around $ e^{-r} ~ \rightarrow 1 - e^{-r} $ (easy exercise).
+
+\paragraph{Comment} on a possible implementation of the above protocol: binary codes for colours 00, 01, 11, consider colorings of form $ V \rightarrow \{00, 01, 11\} $. \medskip
+
+Suppose Bob uses an RSA-based bit commitment method. Bob chooses randomly the permutation $ \tau $ of the colour set. Bob generates $ | V | $ RSA public-private key pairs $ (p_i, q_i, d_i, e_i ) $, one for each vertex $ i \in V $
+
+For each vertex $ i $, Bob computes the encoding $ (y_i, y_i') $ accordingly.
+
+Let $ b_i b_i' $ bet the two bits of $ \tau(\Phi(i)) $ (the colour of $ i $ permutations under $ \tau $).
+
+Then $ y_i = (2x_i + b_i)^{e_i} \mod p_i q_i $, $ y_i' = (2x_i' + b_i')^{e_i} \mod p_i q_i $, where $ x_i $ and $ x_i'$ are random integer numbers greater than $ \frac{p_i q_i}{2} $ (private computation of Bob)
+
+Bob sends $ (e_i, p_i q_i, y_, y_i') $ (implementation of bit commitment) for each $ i \in V $ to Veronica.
+
+Veronica randomly chooses an edge $ \{i, j \} \in E $ and asks Bob to uncover the sent information for $ i $ and $ j $. Bob sends Veronica the secret keys $ d_i $ and $ d_j $ for the end points of the selected edge.
+
+$ \rightarrow $ This allows Veronica to compute $ b_i = (y_i^{d_i} \mod p_i q_i) \mod 2 $ and similarly for $ b_i', b_j, b_j' $. Now just check whether $ b_i b_i' \neq b_j b_j' $.
+
+% bit commitment is usually a black box, but this concept shows how it could work.
+
+Again, it is not hard to show that Veronica is not learning anything about the 3COL from the interactive protocol (CZK property).
+
+\subsection{Multiple Provers}
+% now: larger number of independent provers. The power gets larger.
+
+If we consider several independent provers, one obtains the concept of multi-prover interactive protocols (systems) $ \rightarrow $ complexity class mIP
+
+It suffices to consider 2 independent provers.
+
+It was proven by Babai, Fortnow and Lund (1990) that mIP = NEXP (very powerful!). Unless NEXP = PSPACE (= IP), mIP is more powerful than IP. % non-deterministic exponential, like NP but in exponential time
+
+
+\section{Probabilistically Checkable Proofs (PCP) and the PCP-Theorem}
+
+
+\end{document}
+

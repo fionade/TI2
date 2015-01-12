@@ -1,0 +1,60 @@
+\BOOKMARK [0][-]{part.1}{I Complexity Theory}{}% 1
+\BOOKMARK [1][-]{section.1}{Randomized Complexity Classes}{part.1}% 2
+\BOOKMARK [2][-]{subsection.1.1}{Examples}{section.1}% 3
+\BOOKMARK [3][-]{subsubsection.1.1.1}{Evaluation of Symbolic Determinants}{subsection.1.1}% 4
+\BOOKMARK [3][-]{subsubsection.1.1.2}{SAT \(Satisfiability\)}{subsection.1.1}% 5
+\BOOKMARK [3][-]{subsubsection.1.1.3}{Identity testing for polynomials}{subsection.1.1}% 6
+\BOOKMARK [3][-]{subsubsection.1.1.4}{Prime Number Test}{subsection.1.1}% 7
+\BOOKMARK [2][-]{subsection.1.2}{Complexity Classes Introduced in this Chapter and their Interrelations}{section.1}% 8
+\BOOKMARK [2][-]{subsection.1.3}{RP \(Randomized Polynomial\)}{section.1}% 9
+\BOOKMARK [2][-]{subsection.1.4}{ZPP}{section.1}% 10
+\BOOKMARK [2][-]{subsection.1.5}{PP}{section.1}% 11
+\BOOKMARK [2][-]{subsection.1.6}{BPP \(Bounded Error Probabilistically Polynomial\)}{section.1}% 12
+\BOOKMARK [2][-]{subsection.1.7}{Probability and Bias}{section.1}% 13
+\BOOKMARK [1][-]{section.2}{The Complexity Class FP, Functional Problems and the Polynomial Hierarchy}{part.1}% 14
+\BOOKMARK [2][-]{subsection.2.1}{Functional Problems}{section.2}% 15
+\BOOKMARK [2][-]{subsection.2.2}{Examples}{section.2}% 16
+\BOOKMARK [3][-]{subsubsection.2.2.1}{FSAT}{subsection.2.2}% 17
+\BOOKMARK [3][-]{subsubsection.2.2.2}{TSP: Travelling Salesman Problem}{subsection.2.2}% 18
+\BOOKMARK [2][-]{subsection.2.3}{FP and FNP}{section.2}% 19
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Reduction of Decision Problems \040 Extension to Functional Problems}{subsection.2.3}% 20
+\BOOKMARK [3][-]{subsubsection.2.3.2}{Completeness for Function Problem Classes}{subsection.2.3}% 21
+\BOOKMARK [2][-]{subsection.2.4}{Special Cases and Examples}{section.2}% 22
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Factorisation of Natural Numbers}{subsection.2.4}% 23
+\BOOKMARK [3][-]{subsubsection.2.4.2}{Example 2}{subsection.2.4}% 24
+\BOOKMARK [3][-]{subsubsection.2.4.3}{Happy Net}{subsection.2.4}% 25
+\BOOKMARK [3][-]{subsubsection.2.4.4}{Example 4: Confer Problem 6 in exercises}{subsection.2.4}% 26
+\BOOKMARK [2][-]{subsection.2.5}{DP: Difference Polynomial}{section.2}% 27
+\BOOKMARK [2][-]{subsection.2.6}{Motivating Example: Exact-TSP \040 DP}{section.2}% 28
+\BOOKMARK [3][-]{subsubsection.2.6.1}{Example 1: EXACT-TSP}{subsection.2.6}% 29
+\BOOKMARK [3][-]{subsubsection.2.6.2}{Example 2: SAT-UNSAT}{subsection.2.6}% 30
+\BOOKMARK [2][-]{subsection.2.7}{Critical problems}{section.2}% 31
+\BOOKMARK [3][-]{subsubsection.2.7.1}{CRITICAL SAT}{subsection.2.7}% 32
+\BOOKMARK [3][-]{subsubsection.2.7.2}{Critical Hamiltonian path}{subsection.2.7}% 33
+\BOOKMARK [3][-]{subsubsection.2.7.3}{UNIQUE SAT}{subsection.2.7}% 34
+\BOOKMARK [2][-]{subsection.2.8}{A step towards the polynomial hierarchy}{section.2}% 35
+\BOOKMARK [3][-]{subsubsection.2.8.1}{MAX OUTPUT}{subsection.2.8}% 36
+\BOOKMARK [3][-]{subsubsection.2.8.2}{MAX-WEIGHT SAT}{subsection.2.8}% 37
+\BOOKMARK [2][-]{subsection.2.9}{Polynomial...}{section.2}% 38
+\BOOKMARK [1][-]{section.3}{Complexity of Counting \(Problems\)}{part.1}% 39
+\BOOKMARK [2][-]{subsection.3.1}{Examples}{section.3}% 40
+\BOOKMARK [3][-]{subsubsection.3.1.1}{\043SAT}{subsection.3.1}% 41
+\BOOKMARK [3][-]{subsubsection.3.1.2}{\043MATCHING \(PERMANENT\)}{subsection.3.1}% 42
+\BOOKMARK [3][-]{subsubsection.3.1.3}{Example 3}{subsection.3.1}% 43
+\BOOKMARK [2][-]{subsection.3.2}{\043P}{section.3}% 44
+\BOOKMARK [2][-]{subsection.3.3}{Approximately Counting the Number of Solutions}{section.3}% 45
+\BOOKMARK [2][-]{subsection.3.4}{+P}{section.3}% 46
+\BOOKMARK [3][-]{subsubsection.3.4.1}{Example: +SAT}{subsection.3.4}% 47
+\BOOKMARK [1][-]{section.4}{Interactive Protocols}{part.1}% 48
+\BOOKMARK [2][-]{subsection.4.1}{Introduction and Definitions}{section.4}% 49
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Variant 1}{subsection.4.1}% 50
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Variant 2}{subsection.4.1}% 51
+\BOOKMARK [2][-]{subsection.4.2}{The Graph Isomorphism Problem, its Complement and Interactive Protocol}{section.4}% 52
+\BOOKMARK [2][-]{subsection.4.3}{Interactive protocols with the zero knowledge property\(ZKP\)}{section.4}% 53
+\BOOKMARK [2][-]{subsection.4.4}{Weaker Zero Knowledge Property}{section.4}% 54
+\BOOKMARK [3][-]{subsubsection.4.4.1}{First attempt}{subsection.4.4}% 55
+\BOOKMARK [2][-]{subsection.4.5}{Computational Zero Knowledge Property \(CZK\)}{section.4}% 56
+\BOOKMARK [3][-]{subsubsection.4.5.1}{Hamiltonian Circuit}{subsection.4.5}% 57
+\BOOKMARK [3][-]{subsubsection.4.5.2}{3-Colourability}{subsection.4.5}% 58
+\BOOKMARK [2][-]{subsection.4.6}{Multiple Provers}{section.4}% 59
+\BOOKMARK [1][-]{section.5}{Probabilistically Checkable Proofs \(PCP\) and the PCP-Theorem}{part.1}% 60
