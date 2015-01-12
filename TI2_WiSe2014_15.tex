@@ -1,5 +1,4 @@
 %%!TEX TS-program = latex
-%% https://www.writelatex.com/1588875rkggkp\# /3954162/
 
 \documentclass[11pt]{article}
 \usepackage[a4paper]{geometry}
@@ -1999,6 +1998,328 @@ It was proven by Babai, Fortnow and Lund (1990) that mIP = NEXP (very powerful!)
 
 
 \section{Probabilistically Checkable Proofs (PCP) and the PCP-Theorem}
+
+%% 7. Jänner
+
+\paragraph{Definition:} Let $ r, q : \mathbb{N} \rightarrow \mathbb{N} $. An ($r (n), q(n)$)\footnote{resource bounds} PCP verifier is an algorithm $ V $ with polynomial running time and the following properties:
+\begin{itemize}
+\item For an input $ x $ of length $ n $ and a prof $ B \in \{0, 1 \}^\ast $, the algorithm $ V $ has access to $ x $ and to a random vector $ r \in \{0, 1 \}^{r(n)} $ ($ V $ has access to $ r(n) $ random bits).
+\item With this information, $ V $ computes up to $ O(q(n)) $ positions and then is provided with the corresponding bits of the proof.
+
+Finally, $ V $ has to decide whether or not to accept the proof. $ V(x, r, B) \in \{0, 1\} $ (0 for reject, 1 for accept).
+\end{itemize} 
+
+\paragraph{Remark:} Since $ V $ runs in polynomial time, only polynomials for $ r(n) $ and $ q(n) $ make sense.
+
+\paragraph{Definition:} A decision problem $ L $ belongs to the class PCP$(r(n), q(n))$ if there exists an $(r(n), q(n))$ verifier $ V $ such that
+\begin{itemize}
+\item Completeness: $ \forall x \in L ~ \exists $ proof $ B $ such that $ \mathbb{P}_z(V(x, z, B) = 1) = 1 $
+\item Soundness: $ \forall x \not \in L ~ \forall $ proofs $ B' $ we have $ \mathbb{P}_z(V(x, z, B') = 1) \leq \frac{1}{2} $.
+\end{itemize}
+
+\paragraph{Simple observations:}
+\begin{itemize}
+\item PCP$(0, \log(n)) \longrightarrow $ P
+\item PCP$(0, \text{poly}(n)) \longrightarrow $ NP
+\end{itemize}
+
+The PCP Theorem states that NP = PCP$(\log n, 1)$. Here: proof for weaker assumption, allowing $ n^3 $ random bits.
+%% the proof can be long, but you are only allowed to look at a constant number of bits
+
+\begin{theorem}
+$ L \in $ PCP$(r(n), q(n)) \Rightarrow \exists $ non-deterministic algorithm which decides $ L $ in $ 2^{O(r(n) + \log n} $ time.
+\end{theorem}
+\begin{proof}
+Let pol. $ p (n) $ be the running time of the PCP verifier $ V $.
+
+$ \rightarrow $ at most $ p(n) \cdot 2^{O(r(n)} $ bits are read. Our non-deterministic algorithm guesses these bits.
+
+$ \rightarrow $ random bit string
+
+We simulate the run of $ V $ for each of the strings and accept if all simulations end with acceptance.
+
+$ \rightarrow $ running time is as claimed.
+\end{proof}
+\paragraph{Consequence:} We get NP as PCP$(\log n, \text{poly}(n)) = \cup $ PCP $(\log n, n^k)$, $ k \geq 0 $.
+
+\begin{theorem} (PCP-Theorem; Arora, Lund, Motwani 1992)
+NP = PCP$(\log(n), 1)$
+\end{theorem} 
+
+\subsubsection*{Ideas of a proof: find a $ (n^3, 1)-PCP $ verifier for 3SAT}
+
+A proof verifier will consist of the following four components
+	\begin{itemize}
+	\item linearity test
+	\item robust function evaluation
+	\item consistency test
+	\item verifier for nice proofs
+	\end{itemize}
+
+\paragraph{Verifier for nice proofs}
+\begin{enumerate}
+\item Arithmetisation
+	
+	Let 3SAT instance with variables $ x_1, \dots, x_n $, clauses $ c_1, \dots, c_m $, 3SAT formula $ \Phi$ be given.
+	
+	\begin{tabular}{c c}
+	Boolean form $ \Phi $ & Arithmetisation \\
+	\hline
+	$ x_i $ & $ 1 - x_i $ \\
+	$ \overline{x_i} $ & $ x_i $ \\
+	$ \wedge $ & $ + $ \\
+	$ \vee $ & $ \cdot $ \\
+	true & 1 \\
+	false & 0
+	\end{tabular}
+	
+	Example:
+	\[ \underbrace{(x_1 \vee \overline{x_2} \vee x_3)} \wedge (\overline{x_1} \vee x_2 \vee x_4) \]
+	\[ (1-x_1) \cdot x_2 (1- x_3) + x_1 (1 - x_2) (1 - x_4) \]
+	
+	\paragraph{Observation:}
+	Arithmetisation leads to a polynomial with degree $ \leq 3 $. Let's call the resulting polynomial $ P(x_1, \dots, x_n )$.
+	
+	\begin{itemize}
+	\item Let $ a \in \{ 0, 1\}^n $. $ P(a) = 0 \Leftrightarrow a $ is a satisfiable truth assignment.
+	\item More generally, $ P(a) $ delivers the number of not satisfied clauses.
+	\end{itemize}
+\item Switch to mod 2 arithmetics $ \rightarrow $ the coefficients of $ P \mod 2$ are 0 or 1 $ \rightarrow $ indicator functions.
+
+	Drawback
+	$ P(a) \cong 1 \mod 2 \Rightarrow a $ is not satisfied (no mistake possible, but if $ P(a) \cong 0 \mod 2 $, we do not know
+	
+	$ \rightarrow $ make use of randomness
+	
+\item Consider only a randomly selected subset of clauses.
+	
+	Let $ S $ be a random 0-1 vector of dimension $ m $. Then let $ P^{(\phi)} $ be the sum of all clause polynomials $ P_i $ (term for clause $ c_i $) where $ \phi_i = 1 $
+	
+	$ P^{(\phi)} (a) = \sum \limits_{i = 1}^m \phi_i P_i(a) $
+	
+	We have $ P^{(\phi)} (a) = 0 $ if $ a $ is satisfying.
+	
+	\[ \mathbb{P}(P^{(\phi)} (a) \cong 0(2)) = \mathbb{P}(P^{(\phi)} (a) \cong 1(2)) = 1(2) = \frac{1}{2} \]
+	if $ a $ is not satisfying.
+	
+	Problem: a $ (~, 1) $ PCP verifier can look at only a constant number of proof bits and so we cannot use $ a \in \{0, 1\}^n $ as certificate. We need a method to compute $ P(a) [P^{(\phi)}(a)] \mod 2 $ without knowing $ a $.
+	
+\item Let $ \Psi $ be a polynomial of degree $ \leq 3 $ over $ \mathbb{Z}_2 $. $ \Psi $ consists (in the explicit for $ m $ after multiplying out) of terms of the following type:
+
+	$ \gamma_{\Psi} \in \{0, 1\} $ constant term
+	
+	$ x_i $ $ i \in I_{\Psi}^1 $ (index set)
+	
+	$ x_i \cdot x_j $ $ (i, j )\in I_{\Psi}^2 $
+	
+	$ x_i \cdot x_j \cdot x_k $ $ (i, j )\in I_{\Psi}^3 $
+	
+	Define the linear function $ L_1^a, L_2^a, L_3^a $
+	\begin{itemize}
+	\item $ L_1^a: \mathbb{Z}_2^n \rightarrow \mathbb{Z}_2 $, $ L_1^a (y_1, \dots, y_n) = \sum \limits_{i = 1}^n a_i \cdot y_i $
+	\item $ L_2^a: \mathbb{Z}_2^{n^2} \rightarrow \mathbb{Z}_2 $, $ L_2^a (y_1, \dots, y_n) = \sum \limits_{i = 1}^n \sum \limits_{j = 1}^n a_i \cdot a_j \cdot y_{ij} $
+	\item $ L_1^a: \mathbb{Z}_2^{n^3} \rightarrow \mathbb{Z}_2 $, $ L_3^a (y_1, \dots, y_n) = \sum \limits_{i = 1}^n \sum \limits_{j = 1}^n \sum \limits_{k = 1}^n a_i \cdot a_j \cdot a_k \cdot y_{i j k} $
+	\end{itemize}
+	
+	The function table for $ L_1^a $ has size $ 2^n $, for $ L_2^a $ has size $ 2^{n^2} $, for $ L_3^a $ has size $ 2^{n^3} $. together $ 2^n + 2^{n^2} + 2^{n^3} $
+	
+	Let $ \gamma_{\Psi}^1, \gamma_{\Psi}^2, \gamma_{\Psi}^3 $ be the indicator functions for the sets $ I_{\Psi}^1, I_{\Psi}^2, I_{\Psi}^3 $ ($ \gamma_{\Psi}^2 $ has a 1 in position $ (i, j ) \Leftrightarrow (i, j) \in I_{\Psi}^2 $, similarly for $ \gamma_{\Psi}^1 $, $ \gamma_{\Psi}^3 $)
+	
+	We have that
+	\[ \Psi(a) = \gamma_{\Psi} + \underbrace{L_1^a (\gamma_4^1)} + \underbrace{L_2^a (\gamma_4^2)} + \underbrace{L_3^a (\gamma_431)} \]
+	$ \rightarrow V $ is able to evaluate $ P(a) $ or $ P^{\phi}(a) \mod 2 $ without the help of the three underbraced values above and without having access to $ a $.
+	
+	What we have so far proved the concept for a well-formed (``nice'') proof.
+	
+	Function tables $ L_1^a, L_2^a, L_3^a $.
+	Check $ P^{\Psi}(a) $ for a set of ranom $ \phi$s and accept if they all lead to the result 0 and reject if not.
+	
+	The number of required random bits is $ O(n^3) $ since the number of clauses on a non-trivial 3SAT instance $ \leq 2n + 4 \begin{pmatrix}n \\ 2 \end{pmatrix} + 8 \begin{pmatrix}n \\ 3 \end{pmatrix} = O(n^3) $.
+\end{enumerate} \bigskip
+	
+Now: deal with the situation that ``not everything is behaving nicely''.
+	
+We can assume that the proofs are of the right length.
+%% example: tell students to do 4 exercises, each on separate sheet. If they do not hand in 4 sheets, it's obvious there's something wrong
+	
+
+	
+\paragraph{Linearity test}
+Definition: $ f : \mathbb{Z}_2^m \rightarrow \mathbb{Z}_2 $ is linear if $ f(x + y) = f(x) + f(y) \forall x, y \in \mathbb{Z}_2^m. $
+
+$ f $ is called $ \delta $-close to $ g (f, g: \mathbb{Z}_2^m \rightarrow \mathbb{Z}_2)$ if $ \mathbb{P}_x(f(x) \neq g(x))\leq \delta $ ($ x $ chosen with respect to uniform distribution over  $\mathbb{Z}_2^m$).
+
+We call a function $ f $ ``almost linear'' if it is a $ \delta $-close function to a linear function for a suitable $ \delta > 0 $ (see later).
+
+Idea for linear function: Choose randomly and independently $ x, y \in \mathbb{Z}_2^m $ and call $ f $ non-linear if $ f(x) + f(y) \neq f(x + y) $.
+
+Properties
+\begin{enumerate}
+\item If $ f $ is linear, $ f $ always passes the test
+\item If $ f $ is $ \delta $-close to a linear function for a $ \delta < \frac{1}{3} $, then $ f $ passes the test with probability $ 1 - \frac{\delta}{2} $
+\end{enumerate}
+
+Proof:
+\begin{enumerate}
+\item obvious
+\item we need to show that $ \mathbb{P}_{x, y} (f(x + y) \neq f(x) + f(y)) \neq \frac{\delta}{2} ~~ (\ast) $
+
+	We will work with $ (\ast) $.
+	
+	Constructive approach: construct a linear function $ g $ which is $ \delta $-close to $ f $.
+	
+	Let $ a \in \mathbb{Z}_2^m$. We define $ g(a) $ as follows: We compute $ f(a + b) - f(b) $ for all $ b \in \mathbb{Z}_2^m$. We set $ g(a) = 0 $ if 0 appears more often or just as often as 1 and set $ \phi(a) = 1 $ otherwise.
+	
+	To show that $ \phi $ is linear and $ \delta$-close to $ f $.
+	
+	\begin{itemize}
+	\item Suppose that $ f $ and $ g $ are not $ \delta $-close $ \Rightarrow \mathbb{P}_x(f(x) \leq g(x)) > \delta $. Due to the construction of $ g $, we have $ \mathbb{P}_x(g(a) = f(a + y) - f(y)) \geq \frac{1}{2} $.
+	\item  $ \mathbb{P}_{x, y} (f (x + y) - f(y) \leq f(x)) \geq \mathbb{P}_{x, y}(f(x + y) - f(y) = g(x) $, $ g(x) \neq f(x)) = \frac{1}{2^m} \sum \limits_{a \in \mathbb{Z}_2^m} P_y (f (a + y) - f(y) = g(a), g(a) \neq f(a))$
+	
+	We have $ \forall a \in \mathbb{Z}_2^m f (a) = g(a) $ or $ f(a) \neq g(a) $.
+	
+	If $ f (a) = g(a) $, then the above probability is 0 and in the second case $ f(a) \neq g(a) $ can be omitted.
+	
+	$ \Rightarrow P_{x, y} (f (x + y) - f(y) \neq f(x)) \geq \frac{1}{2^m} \sum \limits_{a \in \mathbb{Z}_2^m} P_y(f(a + y) - f(y) = g(a)) \geq \frac{1}{2^m} \sum \limits_{a \in \mathbb{Z}_2^m} \delta $.
+	
+	Last step: follows because from $ P_x (f (x) \neq g(x)) > \delta $ we get that, for more than $ 2^m \delta $ of all $ a $'s $ \in \mathbb{Z}_2^m $ we have $ g(a) \neq f(a) $.
+	
+	$ \rightarrow $ leads to contradiction and leads to the claimed result.
+	\item Show that $ g $ is linear
+
+%%% 12. Jänner 2015
+	Consider $ p(a) := \mathbb{P}_x (g(a) = f(x + a) - f(x) $. Obviously $ p(a) \geq \frac{1}{2} $ (due to the choice of $ g $). We will show that $ p(a) \geq 1 - \delta $.
+	
+	Let $ x \in \mathbb{Z}_2^m $ randomly chosen $ \Rightarrow x + a \in \mathbb{Z}_2^m $ randomly chosen.
+	
+	Event 1:
+	$ \mathbb{P}_{x, y} (f(x + a) + f(y) \neq f(x + a + y)) \leq \frac{\delta}{2} $. (Assumption $(\ast) $, equivalent to (P2), compare the arguments from the last lecture)
+	
+	Analogously we have event 2:
+	$ \mathbb{P}_{x, y} (f(x) + f(y + a) \neq f(x + a + y)) \leq \frac{\delta}{2} $
+	
+	$ \Rightarrow $ Probability of the union of the two events is bounded from above by $ \delta $ and the probability of the complement is bounded from below by $ 1 - \delta $.
+	
+	According to de Morgan, this complement is the intersection of the events
+	$ f(x) + f(y + a) = f(x + y + a) $, $ f(y) + f(x + a) = f(x + y + a) $
+	
+	%% twice the same?
+	$ \rightarrow $ subset of the event $ f(x) + f(y + a) = f(y) + f(x + a) $
+	
+	$ \Rightarrow \mathbb{P}_{x, y} (f(x + a) + f(y) = f(y + a) + f(x)) \geq 1 - \delta $
+	$ \Leftrightarrow \mathbb{P}_{x, y} (f(x + a) - f(x) = f(y + a) - f(y)) \geq 1 - \delta $ $ (\ast \ast) $
+	
+	$ (\ast \ast) = \sum \limits_{z} \in \{0, 1\} \mathbb{P}_{x, y} (f(x + a) - f(x) = z, f(y + a) - f(y) = z) $
+	$ = \sum \limits_{z} \in \{0, 1\} \mathbb{P}_{x} (f(x + a) - f(x) = z) \cdot \mathbb{P}_{y} (f(y + a) - f(y) = z) $
+	$ = \sum \limits_{z} \in \{0, 1\} \mathbb{P}_{x} (f(x + a) - f(x) = z)^2 $
+	
+	Now observe
+	
+	For
+		\begin{itemize}
+		\item $ z = g(a) \mathbb{P}_y(f(x + a) - f(x) \geq z) = p(a) $
+		\item $ z \leq g(a) \mathbb{P}_y(f(x + a) - f(x) \geq z) = 1 - p(a) $
+		\end{itemize}
+	
+	Rewriting the above, we get
+	$ 1 - \delta \leq [p(a)]^2 + (1 - p(a))^2 $
+	
+	We know that $ p(a) > \frac{1}{2} \rightarrow 1 - p(a) \leq \frac{1}{2} \leq p(a) $
+	
+	So we have $ (p(a))^2 + (1 - p(a))^2 \leq \underbrace{(p(a))^2}_{p(a)} + p(a) (1 - p(a)) $
+	
+	$ \Rightarrow p(a) \geq 1 - \delta $ as we wanted to prove.
+	\end{itemize}
+	
+	Event I: $ p(a) = \mathbb{P}_x (g (a) = f(a + x) - f(x) ) \geq 1 - \delta $
+	
+	Event II: $ p(b) = \mathbb{P}_x (g (a) = f(b + a + y) - f(a + y) ) \geq 1 - \delta $ (remark if $ x $ is uniformly distributed, this is true for $ a + x $ as well)
+	
+	Event III: $ p(a + b) = \mathbb{P}_x (g(a + b) = f(a + b+ x) - f(x) ) \geq 1 - \delta $
+	
+	$ \rightarrow $ probability for the intersection of all 3 events is $ \geq 1 - 3 \delta $.
+	
+	Add I + II and subtract II from the sum 
+	
+	$ \Rightarrow \mathbb{P}_x(g (a) + g(b) = g(a + b)) \geq 1 - 3 \delta $.
+	
+	Since $ \delta < \frac{1}{3} $ we obtained that $ \mathbb{P}_x (g (a) + g(b) = g(a + b)) > 0 $.
+	
+	since the event $ g(a) + g(b) = g(a + b) $ does not depend on $ x $, this probability must be 1 and thus $ g $ is linear!
+	
+\end{enumerate}
+
+\paragraph{Robust function evaluator}
+
+Goal: for $ \delta < \frac{1}{3} $, we want the following properties fulfilled:
+
+\begin{enumerate}
+	\item If $ f $ is linear, the function evaluator should deliver $ f(a) $ as value for $ a \forall a \in \mathbb{Z}_2^m $
+	\item If $ f $ is $ \delta $-close to linear function $ g $, then the robust function evaluator should provide $ g(a) $ as value with an error probability bounded by $ 2 \delta $.
+\end{enumerate}
+
+To determine the value the function evaluator returns for $ f(a) $, we proceed as follows:
+
+Choose $ x \in \mathbb{Z}_2^m $ randomly and compute $ f(x + a) - f(x) $ and returns this as a result for the value $ f(a) $
+
+\begin{enumerate}
+\item is trivially fulfilled.
+\item $ f $ is $ \delta $-close to a linear function $ g \Rightarrow \mathbb{P}_x (f(x) = g(x) \geq 1 - \delta \rightarrow \mathbb{P}_x (f(x + a) = g(x + a)) \geq 1 - \delta $
+
+$ \rightarrow $ probability the both events occur is $ \geq 1 - 2 \delta $.
+
+If both events hold, we get $ f(x + a) - f(x ) = f(x + a) - g(x) \overset{g \text{ is linear}}{=} g(a) $
+\end{enumerate}
+
+\paragraph{Consistency test}
+
+We have given 3 function tables for $ f_1, f_2, f_3 $ (in our case $ L_1^a, L_2^a, L_3^a )$.
+
+$ f_1, f_2, f_3 $ are either linear or $ \delta $-close to linear functions $ g_1, g_2, g_3 $ (otherwise they fail the linearity test).
+
+Here we assume $ \delta \leq \frac{1}{24} $. Following properties wanted:
+
+\begin{enumerate}
+
+\item If the function tables for $ f_1, f_2, f_3 $ represent linear function of the type $ L_1^a, L_2^a, L_3^a )$ (for $ a \in \{0, 1\}^n) $, then the consistency should always be passed.
+\item If there does not exist $ a \in \{0, 1\}^n $ such that the function tables for $ f_1, f_2, f_3 $ are $ \delta $-close to $ L_1^a, L_2^a, L_3^a )$, then the consistency test should be passed only with a probability bounded by an appropriately chosen constant (bounded error probability)
+
+\end{enumerate}
+
+Choose randomly and independently $ x, x', x'' \in \mathbb{Z}_2^n, y \in \mathbb{Z}_2^n $.
+
+Define
+\begin{itemize}
+\item $ x \circ x' $ by $(x \circ x')_{ij} = x_i \cdot x'_j ~~\rightarrow $ dim $n^2 $
+\item $ x'' \circ y $ by $(x'' \circ y)_{ijk} = x''_i \cdot y_{jk} ~~\rightarrow $ dim $n^3 $
+\end{itemize}
+
+Use robust function evaluator to get the values
+\begin{itemize}
+\item $ b $ for $ f_1(x) $
+\item $ b' $ for $ f_1(x') $
+\item $ b'' $ for $ f_1(x'') $
+\item $ c $ for $ f_2(x \circ x') $
+\item $ c' $ for $ f_2(y) $
+\item $ d $ for $ f_3(x'' \circ y) $
+\end{itemize}
+
+Consistency test is passed if $ b \cdot b' = c$ and $ b'' \cdot c' = d $
+
+$ L_1^a, L_2^a, L_3^a )$ pass this test because $ L_1^a(x) \cdot L_1^a(x') \cdot L_1^a(x'') = L_2^a(x \circ x') $ and $ L_1^a(x'') \cdot L_2^a(y) = L_3^a(x'' \circ y) $
+
+Proof for second property: since $ \delta < \frac{1}{24} \rightarrow 2\delta < \frac{1}{12} $. Since we perform 6 evaluations, each with error probability $ < \frac{1}{12} $, the overall error probability for evaluation part is $ < \frac{1}{2} $.
+
+Now assume that the function evaluations are correct, but the function tables are inconsistent. Consider here the $ b b' \neq c $ case (the $ b'' c' \neq d $ case works similarly).
+
+Consider $ x $ and $ x' $ as column vectors. Idea of consistency test is comparing $ x^t A x' $ and $ x^t B x' $ and exploiting that if $ A \neq B $ for random $ x $ and $ x' $ we get $ x^t A x' \neq x^t B x' $ with probability $ \geq \frac{1}{4} $. \bigskip
+
+Combination of all together leads to the claimed result.
+
+\paragraph{Closing remark}
+It can be shown that PCP(poly($n$), 1) = NEXP.
+
+(Idea of proof: combination of the proof for the PCP theorem and the proof of theorem of Shamir that IP = PSPACE)
 
 
 \end{document}
