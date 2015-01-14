@@ -58,3 +58,19 @@
 \BOOKMARK [3][-]{subsubsection.4.5.2}{3-Colourability}{subsection.4.5}% 58
 \BOOKMARK [2][-]{subsection.4.6}{Multiple Provers}{section.4}% 59
 \BOOKMARK [1][-]{section.5}{Probabilistically Checkable Proofs \(PCP\) and the PCP-Theorem}{part.1}% 60
+\BOOKMARK [0][-]{part.2}{II Approximation from a Complexity Point of View}{}% 61
+\BOOKMARK [1][-]{section.6}{Introduction}{part.2}% 62
+\BOOKMARK [1][-]{section.7}{Definitions}{part.2}% 63
+\BOOKMARK [2][-]{subsection.7.1}{Approximation Ratio}{section.7}% 64
+\BOOKMARK [2][-]{subsection.7.2}{Adjusted Approximation Ratio}{section.7}% 65
+\BOOKMARK [1][-]{section.8}{Complexity Classes}{part.2}% 66
+\BOOKMARK [2][-]{subsection.8.1}{Complexity classes APX, APX}{section.8}% 67
+\BOOKMARK [2][-]{subsection.8.2}{PTAS}{section.8}% 68
+\BOOKMARK [2][-]{subsection.8.3}{FPTAS}{section.8}% 69
+\BOOKMARK [2][-]{subsection.8.4}{Relation}{section.8}% 70
+\BOOKMARK [1][-]{section.9}{Examples}{part.2}% 71
+\BOOKMARK [2][-]{subsection.9.1}{MAX CLIQUE}{section.9}% 72
+\BOOKMARK [2][-]{subsection.9.2}{VERTEX COVER}{section.9}% 73
+\BOOKMARK [2][-]{subsection.9.3}{MAX 3-SAT}{section.9}% 74
+\BOOKMARK [2][-]{subsection.9.4}{Simple PTAS Problem}{section.9}% 75
+\BOOKMARK [2][-]{subsection.9.5}{FPTAS Example: Knapsack Problem}{section.9}% 76

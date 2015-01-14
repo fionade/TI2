@@ -181,4 +181,44 @@
 \contentsline {paragraph}{Linearity test}{47}{section*.134}
 \contentsline {paragraph}{Robust function evaluator}{49}{section*.135}
 \contentsline {paragraph}{Consistency test}{50}{section*.136}
-\contentsline {paragraph}{Closing remark}{50}{section*.137}
+\contentsline {paragraph}{Closing remark}{51}{section*.137}
+\contentsline {part}{II\hspace {1em}Approximation from a Complexity Point of View}{51}{part.2}
+\contentsline {section}{\numberline {6}Introduction}{51}{section.6}
+\contentsline {paragraph}{Motivation}{51}{section*.138}
+\contentsline {paragraph}{Example 1}{51}{section*.139}
+\contentsline {section}{\numberline {7}Definitions}{51}{section.7}
+\contentsline {subsection}{\numberline {7.1}Approximation Ratio}{51}{subsection.7.1}
+\contentsline {paragraph}{Remarks}{52}{section*.140}
+\contentsline {paragraph}{Given:}{52}{section*.141}
+\contentsline {paragraph}{Goal:}{52}{section*.142}
+\contentsline {subsection}{\numberline {7.2}Adjusted Approximation Ratio}{52}{subsection.7.2}
+\contentsline {section}{\numberline {8}Complexity Classes}{52}{section.8}
+\contentsline {subsection}{\numberline {8.1}Complexity classes APX, APX$^\ast $}{52}{subsection.8.1}
+\contentsline {paragraph}{Definition:}{52}{section*.143}
+\contentsline {subsection}{\numberline {8.2}PTAS}{53}{subsection.8.2}
+\contentsline {paragraph}{Definition: PTAS (Polynomial Time Approximation Scheme:}{53}{section*.144}
+\contentsline {subsection}{\numberline {8.3}FPTAS}{53}{subsection.8.3}
+\contentsline {paragraph}{Definition: FPTAS (Fully Polynomial Time Approximation Scheme:}{53}{section*.145}
+\contentsline {paragraph}{Comment:}{53}{section*.146}
+\contentsline {subsection}{\numberline {8.4}Relation}{53}{subsection.8.4}
+\contentsline {section}{\numberline {9}Examples}{53}{section.9}
+\contentsline {subsection}{\numberline {9.1}MAX CLIQUE}{53}{subsection.9.1}
+\contentsline {paragraph}{Given:}{53}{section*.147}
+\contentsline {paragraph}{Goal:}{53}{section*.148}
+\contentsline {subsection}{\numberline {9.2}VERTEX COVER}{54}{subsection.9.2}
+\contentsline {paragraph}{Given:}{54}{section*.149}
+\contentsline {paragraph}{Goal:}{54}{section*.150}
+\contentsline {paragraph}{Claim 1:}{54}{section*.151}
+\contentsline {paragraph}{Claim 2:}{54}{section*.152}
+\contentsline {paragraph}{Claim 2:}{54}{section*.153}
+\contentsline {paragraph}{Remark:}{54}{section*.154}
+\contentsline {subsection}{\numberline {9.3}MAX 3-SAT}{54}{subsection.9.3}
+\contentsline {paragraph}{Given:}{54}{section*.155}
+\contentsline {paragraph}{Task:}{55}{section*.156}
+\contentsline {subsection}{\numberline {9.4}Simple PTAS Problem}{55}{subsection.9.4}
+\contentsline {paragraph}{Given:}{55}{section*.157}
+\contentsline {paragraph}{Task:}{56}{section*.158}
+\contentsline {paragraph}{Observation:}{56}{section*.159}
+\contentsline {subsection}{\numberline {9.5}FPTAS Example: Knapsack Problem}{56}{subsection.9.5}
+\contentsline {paragraph}{Given:}{56}{section*.160}
+\contentsline {paragraph}{Task:}{57}{section*.161}

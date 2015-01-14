@@ -2322,5 +2322,305 @@ It can be shown that PCP(poly($n$), 1) = NEXP.
 (Idea of proof: combination of the proof for the PCP theorem and the proof of theorem of Shamir that IP = PSPACE)
 
 
+%%% PART 2
+\part{Approximation from a Complexity Point of View}
+
+\section{Introduction}
+\paragraph{Motivation} behind looking for approximative solutions is that many optimisation problems are very hard.
+
+We need a measure to evaluate the quality of an approximate solution.
+
+\paragraph{Example 1} \ \\
+
+\begin{tabular}{c c c}
+Instance & optimal value & approximate solution value \\
+1 &  17 & 27 \\
+2 & 1700 & 1720 \\
+\end{tabular} \medskip
+
+Typically, one works with a relative error message (independent of scaling) and in the example this then favours the situation in instance 2.
+
+In the following, we consider optimisation problems where $ x $ denotes the input. $ S(x) $ denotes the set of feasible solutions and $ v(x, s) $ the objective function value of a feasible solution $ s \in S(x) $.
+
+Assumptions:
+\begin{itemize}
+\item $ v(x, s) > 0 \forall x, s $: simplification to make the following definitions easier.
+\item $ \forall x, s \in S(x) $ the encoding length of $ s $ and $ v(x, s) $ are polynomials in encoding length of $ x $. Background: we want approximation algorithms to run in polynomial time.
+\end{itemize}
+
+\section{Definitions}
+
+\subsection{Approximation Ratio}
+$ r(x, s) := \frac{v(x, s)}{v_{opt} (x)} $ where $ v_{opt} (x) $ is the optimal value for instance with input $ x $ and $ s \in S(x) $ for minimisation problem.
+
+$ r(x, y) :=\frac{v_{opt} (x)}{v(x, s)} $ where $ s \in S(x) $ for maximisation problem.
+
+\paragraph{Remarks}
+\begin{itemize}
+\item This definition is possible because we assumed $ v(x, s) > 0 $.
+\item We always get $ r(x, s) \geq 1 $. The closer we are to 1, the better is $ s $.
+\item If $ r(x, s) \leq c $ with $ c \geq 1 $, we call $ s $ a $ c $-approximation.
+\end{itemize}
+
+Worst case p.o.w: For an algorithm $ A $ let $ s_A(x) \in S(x) $ be the solution returned by algorithm $ A $.
+
+Approximation quality (ratio) of $ A $: $ r_A(x) := r(x, S_A(x)) $.
+
+For algorithm $ A $ we define $ r_A(n) := \max\{ r_A(x) ~|~ \underbrace{|x|}_{\text{encoding length}} \leq n\} $.
+
+If $ r_A(n) \leq c $ for a $ c \geq 1 $ and all $ n \in \mathbb{N} $ we call $ A $ a $ c $-approximation or $ c $-factor approximation.
+
+But sometimes $ r_A(n) $ is not the most suitable quality measure.
+
+Let's consider the bin packing problem (BP) and the so-called BFD (best fit decreasing) algorithm for BP.
+
+\paragraph{Given:}  numbers (item sizes) $ a, \dots, a_n \in (0, 1) $.
+\paragraph{Goal:} pack the items in as few bins (of unit capacity) as possible.
+
+One can show that $ v(x, s_{BFD} (x) \leq \frac{11}{9} \cdot v_{opt} (x) + 4 $.
+
+$ r_{BFD} (x) \leq \frac{11}{9} + \frac{4}{v_{opt}} $.
+
+Now let us assume that
+$ v_opt(x) \geq 2 $ $ \rightarrow r_{BFD} (x) \leq \frac{29}{9} $.
+
+For large instances, $ \frac{29}{9} $ is far from the truth. For $ v_{opt} \rightarrow \infty $, the ratio much rather behaves like $ \frac{11}{9} $.
+
+%% go to infinity: ratio of best and worst solution towards 1
+
+This motivates the following definition
+
+\subsection{Adjusted Approximation Ratio}
+
+$ r_A^\infty := inf \{ b ~ \begin{array}{| l} \forall \varepsilon > 0 \exists v(\varepsilon) > 0 \\ \forall x, v_{opt}(x) \geq v(\varepsilon) : r_A (x) \leq b + \varepsilon \end{array} $
+
+It is easy to see that $ r_A{BFD}^\infty = \frac{11}{9} $ (this is better than the best approximation algorithm for BP can get in terms of $ r_A(n) $ unless P = NP)
+
+\section{Complexity Classes}
+\subsection{Complexity classes APX, APX$^\ast$}
+
+\paragraph{Definition:} Let $ r(n) : \mathbb{N} \rightarrow [0, \infty) $ with $ r(n + 1) \geq r(n) \forall n \in \mathbb{N} $.
+
+The complexity class APX$(r(n)) $ contains all optimisation problems which can be solved by an approximation algorithm $ A $ with (max.) approximate ratio $ r_A(n) \leq r(n) $ where $ A $ is required to run in polynomial time. \medskip
+
+APX $ := \bigcup \limits_{c \geq 1, \text{ const}} $ APX$(c) $.
+
+(problems which are approximated with a constant factor in polynomial time) \medskip
+
+APX$^\ast := \bigcap \limits_{c > 1, \text{ const}} $ APX$(c) $.
+
+(problems which are approximations in polynomial time with approximation factor arbitrarily close to 1)
+
+\subsection{PTAS}
+\paragraph{Definition: PTAS (Polynomial Time Approximation Scheme:}
+
+A PTAS for an optimisation problem $ Q $ is an algorithm, which for an input $ (x, \varepsilon) $ where $ x $ is an input for $ Q $ and $ \varepsilon > 0 $ is a rational number provides a $ (1 + \varepsilon) $-optimal solution (approximation factor $ \leq 1 + \varepsilon) $ for $ Q $ in time polynomial in $ |x| $.
+%% here: don't mention how running time depends on epsilon 
+
+PTAS as a complexity class class: contains all optimisation problems for which there exists a PTAS.
+
+\subsection{FPTAS}
+\paragraph{Definition: FPTAS (Fully Polynomial Time Approximation Scheme:}
+see PTAS, but the running time is required to be polynomial in $ |x | $ and $ \frac{1}{\varepsilon} $.
+
+\paragraph{Comment:} The running time of a PTAS can be exponential in $ \frac{1}{\varepsilon} $, e.g. $ O(n^{ \frac{1}{\varepsilon}}) $, while for a FPTAS this is forbidden.
+
+\subsection{Relation}
+Obviously, we have P $ \subseteq $ FPTAS $ \subseteq $ PTAS $ \subseteq $ APX.
+
+\section{Examples}
+\subsection{MAX CLIQUE}
+
+\paragraph{Given:} undirected graph $ G = (V, E) $, $ |V| = n $.
+
+\paragraph{Goal:} find a clique with maximum cardinality (complete subgraph). \medskip
+
+Algorithms:
+\begin{enumerate}
+\item Trivial approximation alg.: output an arbitrary single vertex $ \rightarrow $ ratio $ \leq n $
+\item Choose $ k \in \mathbb{N} , k < n $. Consider all subsets of $ V $ with cardinality $ k $ and output best one $ \rightarrow $ ratio $ \leq \frac{n}{k} $.
+\end{enumerate}
+
+Later we will see that MAXCLIQUE $ \not \in $ APX.
+
+
+%%% 14 Jänner
+
+\subsection{VERTEX COVER}
+\paragraph{Given:} undirected graph $ G = (V, E) $, $ |V| = n $, $ |E| = m $.
+
+\paragraph{Goal:} Find vertex cover $ V' \subseteq V $ such that each edge in $ e $ is covered by a vertex in $ V' $ (each edge has at least end point in $ V' $) and such that $ V' $ is of minimum cardinality.
+
+NP-complete for general graphs. \medskip
+
+Let's consider the following approximation algorithm:
+\begin{enumerate}
+\item $ E' = \varnothing $
+\item As long as there still exists an edge $ \{u, v\} $ such that neither $ u $ nor $ v $ are covered by an edge in $ E' $, choose such an edge and insert it into $ E' $.
+\item $ r' $ s the set of end vertices of the edges in $ E' $.
+\end{enumerate}
+% then the vertex cover is always a complete matching
+
+\paragraph{Claim 1:} $ E' $ is a maximal matching (not necessarily a matching of maximum cardinality).
+
+\begin{proof}
+$ E' $ is a matching due to the construction that only edges $ \{u, v\} $ which are yet uncovered are added. $ E' $ is maximal because otherwise a new edge could be added to $ E' $.
+\end{proof}
+
+\paragraph{Claim 2:} $ V' $ is a vertex cover.
+
+\begin{proof}
+Suppose $ V' $ is not a vertex cover $ \Rightarrow ~ \exists $ edge $ \{u, v\} $ which is not covered by $ V' ~ \Rightarrow ~ u, v \not \in V' $.
+
+$ \{u, v\} \not \in E' $, that is, we could add $ \{u, v\} $ to $ E' $ and so contradict the maximality.
+\end{proof}
+
+\paragraph{Claim 2:} the algorithm above is a 2-approximation algorithm for VERTEX COVER.
+
+\begin{proof}
+Suppose $ | E' | = k ~ \Rightarrow ~ | V' | \leq 2K $. The claim now follows immediately
+\end{proof}
+
+
+$ \rightarrow $ VERTEX COVER $ \in $ APX.
+%% other example: tsp without assumptions about distance
+
+
+\paragraph{Remark:} There exist alternative approaches which also lead to 2-approximation for VERTEX COVER.
+
+\subsection{MAX 3-SAT}
+
+\paragraph{Given:} 3SAT formula $ \Phi $ in variables $ x_1, \dots, x_n $ with clauses $ c_1, \dots, c_n $, exactly 3 literals per clause.
+
+\paragraph{Task:} Find a truth assignment that satisfies as many clauses as possible.
+
+MAX 3-SAT is NP-hard.
+
+Consider the following simple randomised algorithm:
+\begin{itemize}
+\item Independently assign 0-1 (true-false) values to the variables $ x_1, \dots, x_n $ according the the uniform distribution.
+
+$ \rightarrow X_j = \left\{ \begin{array}{l l} 1 & \text{if clause $ c_j $ is satisfied by truth assignment } x \\ 0 & \text{otherwise} \end{array} \right. $
+
+\item We want to maximise $ X = \sum x_j $ or rather the expected value $ E(X) $.
+
+\item $ E(X) = \sum \limits_{j = 1}^m E(X_j) = \frac{7}{8} m $, since in 7 out of 8 cases, $ c_j $ is fulfilled % (only if all variables are false, all clauses are false)
+
+$ \rightarrow $ Randomised algorithm of quality $ \frac{7}{8} $.
+\end{itemize} \medskip
+
+Next goal: deterministic $ \frac{8}{7} $-approximation algorithm.
+
+Use a derandomisation method based on conditional probabilities: fix the values for $ x_1, \dots x_n $ sequentially according to a suitably chosen order.
+
+We need to guarantee that at each step of this fixing process, we are left with a situation s.t. for a (suitable) random choice of the remaining variables, $ \geq {7}{8}m $ (or expected value) clauses can be satisfied.
+
+During the course of the algorithm, we end up with 0 to 3 fixed literals.
+
+Let $ b \in \{0, 1\} $.
+
+Consider $ a_j := E(X_j | x_n = b ) $, $ j = 1, \dots, m $.
+
+If by setting $ x_n = b $ the clause $ c_j $ is already satisfied, then we get $ a_j = 1 $. Otherwise $ \exists k \in \{1, 2, 3\} $ not yet fixed literals in $ c_j $.
+
+Then it is easy to see that $ a_j = \frac{2^k - 1}{2^k} = 1 - \frac{1}{2^k} $.
+
+We set $ a_j = 0 $ if the clause $ c_j $ is already fixed to be non-satisfied.
+
+$ E (X | x_n = b) = \sum \limits_{j = 1}^m E (x_j | x_n = b) = \sum \limits_{j = 1}^m a_j $ is computable in $ O(m) $ time.
+
+$ E(X) = \frac{1}{2} E(X | x_n = 1) + \frac{1}{2} E(X | x_n = 0) $.
+
+We know that $ E(X) \geq \frac{7}{8} ~ \Rightarrow ~ \exists $ a choice for $ x_n = b, b \in \{0, 1\} $ such that $ E(X | x_n = b) \geq \frac{7}{8} m $.
+
+Repeat this iteratively until all variables are fixed. Running time $ O(n \cdot m ) $, approximation ratio $ \frac{7}{8} $.
+
+\subsection{Simple PTAS Problem}
+
+Consider the following 2 machine scheduling problem:
+
+\paragraph{Given:} set $ J = \{1, \dots, n \} $ jobs, 2 identical machines, $ p_j $ processing time for job $ j $, with $ j = 1, \dots, n $.
+
+\paragraph{Task:} Find assignments of the jobs to the machines s.t. the maximum completion time (completion of the latest job) is minimised.
+
+This is an NP-hard problem. $ T = \sum \limits_{j = 1}^n p_j $, obviously $ v_opt(x) \geq \frac{T}{2}  $ in case of equally loaded machines.
+
+We call a job $ j $ large if $ p_j \geq \varepsilon T $, otherwise small. ($ \varepsilon $ is our target precision, we aim for a $( 1 + \varepsilon) $-approximation).
+
+\paragraph{Observation:} There are at most $ \lfloor \frac{1}{\varepsilon} \rfloor $ large jobs.
+
+We look at all $ 2^{ \lfloor \frac{1}{\varepsilon} \rfloor} $ possible assignments of the large jobs to the 2 machines. For each of these assignments we now distribute the small jobs by using the following very simple least loaded heuristic:
+
+\begin{enumerate}
+\item Go through the small jobs (in whatever order we want)
+\item assign the jobs one by one to the machine which currently has the smaller load (ties are broken arbitrarily).
+\item $ \rightarrow $ we get $ 2^{ \lfloor \frac{1}{\varepsilon} \rfloor} $ solutions and return the best among them.
+\end{enumerate}
+
+Running time: $O (2^{\frac{1}{\varepsilon}} \cdot n ) $, polynomial in $ n $, not polynomial in $ \frac{1}{\varepsilon} $, ok for PTAS. % Don't apply a PTAS in practice in such context, heuristics are better
+
+Still to show: we und up with a $ ( 1+ \varepsilon )$-approximation, $ v(x, s) \geq v_{opt} (x) $
+
+\begin{proof}
+Consider an optimal solution and consider the corresponding assignment of the large jobs (of the full problem) to $ M_1 $ and $ M_2 $. (This assignment is also considered by us since we consider all possible ones)
+
+Cases
+\begin{enumerate}
+\item All small jobs end up on one of the machines (our approach cannot make anything wrong here)
+\item Not all ...
+	
+	Here, the maximum difference of the two finishing time on $ M_1 $ and $ M_2 \leq \varepsilon \cdot T $.
+	
+	$ \rightarrow $ maximum difference of the finishing time of the machine which takes longer and $ \frac{T}{2} $ (lower bound for optimal value) is bounded by $ \varepsilon \frac{T}{2} $.
+	
+	$ \Rightarrow v(x, s) \leq \frac{T}{2} + \frac{\varepsilon T}{2} = (1 + \varepsilon) \frac{T}{2} \leq (1 + \varepsilon) v_{opt} (x) $
+\end{enumerate}
+
+\end{proof}
+
+Drawback: running time is exponential in $ \frac{1}{\varepsilon} $, thus not practical
+
+\subsection{FPTAS Example: Knapsack Problem}
+
+\paragraph{Given:} Set of $ n $ items. Item $ j $ has weight $ w_j $ and profit $ p_j $, $ j = 1, \dots, n $ (Knapsack XXX
+
+\paragraph{Task:} Find subset $ J \subseteq \{1, \dots, n\} $ such that $ \sum \limits_{j \in J} w_j \leq c $ and $ \sum \limits_{j \in J} P_j \rightarrow \max $
+
+Classical dynamic programming approach for KP:
+\begin{itemize}
+\item Define $ F(K, y) := \left\{ \max \sum_{j = 1}^k p_j x_j \text{ such that } \sum \limits_{j=1}^k w_j x_j \leq y, x_j \in \{0, 1\}, j = 1, \dots, n \right\} $ for $ k = 1, \dots, n $, $ y = 0, \dots, b $.
+
+$ F(n, b) $ delivers optimal value of KP
+\item Classical recursion $ F(k + 1, y) = \max \{F( K, y), F(K, y - w_{k + 1} ) + p_{k + 1} \} $
+\item $ F(n, b) $ can be computed in $ O(n b) $ time.
+\end{itemize}
+
+Consider the following somehow ``dual'' approach:
+\begin{itemize}
+\item Define $ M(k, v) $ as the minimum Knapsack capacity with which we can obtain a total profit of $ v $ by considering items $ 1, \dots, k $.
+
+$ k = 1, \dots, n $, $ v \in \{1, \dots, \underbrace{v_{max}}_{\text{max. poss. profit}} \} $ %% integers required
+
+$ v_{max} \leq \sum \limits_{j = 1}^n p_j $
+
+\item $ M(k + 1, v) = \min \{ M(k, v), M(k, v - p_{k + 1}) + w_{ k + 1} $
+
+\item Init $ M(0, v) = \infty ~ \forall v > 0 $
+
+$ M(i, v) = \infty ~ \forall v < 0 $
+
+
+\item An optimal solution of KP can be optained in $ O(n \cdot V_{max} ) = O(n ^2 p_{max}) $
+
+$ p_{max} = max p_j,$ $ j = 1, \dots, n $.
+\end{itemize}
+
+Idea: apply scaling (includes rounding) to the profits $ \rightarrow $ new, easier Knapsack instance
+
+Consider the new KP instance with $ n $ items with the old weights, but changed profits: replace $ p_ j $ by $ \tilde p_j = \lfloor \frac{p_j}{t} \rfloor $ where $ t $ will be an appropriately chosen scaling factor.
+
+The Knapsack capacity stays the same. %% feasible solutions of the new solution are a feasible solution of the old one
+
+
 \end{document}
 
