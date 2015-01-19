@@ -2725,7 +2725,7 @@ There is no asymptotic approximation algorithm for VC. Given $ G \overset{\right
 
 $ (3, 4) $ gap $ \rightarrow (3K, 4K) $ gap problem.
 
-\subsection{XX}
+\subsection{Implications}
 
 \begin{theorem}
 If P $ \neq $ NP, NP-complete problems with small solution value ($ \exists $ poylnomial $ p $ such that for all inputs $ x ~\forall $ feasible solutions $ s \in S(x) : ~ v(x, s) \in \mathbb{Z}_0^+, v(x, s) \leq p(|x|) )$ 
@@ -2781,11 +2781,60 @@ $ J $ constant $ \rho > 1 $ such that a $ \rho $ approx. for MAX 3SAT implies P 
 
 \begin{proof}
 
-% eq of PCP formulations: consider CSP (constraint satisfaction problem)
-% q CSP (collection of functions), q \in N ...
+To show equivalence of the two PCP formulations, one considers the so-called CSP (Constraint Satisfaction Problem)
+
+$ q $ CSP, $ q \in \mathbb{N} $, with CSP as a collectin of functions $ c_1, \dots, c_m $,
+%% different variable!
+$ c_i : \{ 0, 1\}^n \rightarrow \{0, 1\} $ 
+
+Each of the $ c_i$ 's depends on only at most $ q $ of the $ n $ input variables
+
+$ c_i(u) = f(u_{j1}, \dots, u_{j_q}) $
+
+$ c_i(u)  = 1 $ means the constraint is fulfilled
+
+$ \frac{ \sum c_i(u)}{m} \dots $ val $( c) $ (everything together) max over $ q_n $, $ u \in \{0, 1\} $
+
+%%
+
+3SAT is a special 3CSP
+
+$ \rho $ GAP  $ q $ CSP, $ q \in \mathbb, \rho < 1 $
+
+Decide whether a given instance $ \phi $ of $ q $ CSP fulfills $ val (c) = 1$  (yes instance) or $ val(c) < \rho $ (no instance)
 
 \end{proof}
 
+\begin{theorem} (PCP 3)
+
+$ \exists q \in \mathbb{N}, \rho \in (0, 1) $ s.t. $ \rho $ GAP $q$ CSP is NP-hard.
+
+\end{theorem}
+
+\begin{proof}
+
+One way to show equivalence is to show PCP 1 (last chapter) $ \Rightarrow $ PCP 3 \newline
+
+\begin{tabular}{l l}
+View of PCP 1 & PCP 3 \\
+\hline
+PCP verifier $ V $ & CSP instance $ \phi $ \\
+
+PCP Proof $ P $ & assignment of 0, 1 values to variables in $ \phi $ \\
+
+length of proof & number of variables \\
+
+\# proof bits $ q $ & \# max nr of variables per constraint \\
+
+\# random bits $ q $ & logarithm of nr of constraints \\
+
+error probability (typ. $ \frac{1}{2} $ & max. of val(c) in no case
+\end{tabular}
+\end{proof}
+
+So far: if P $ \neq $ NP, MAX 3SAT cannot be approximated arbitrarily close to 1. This does yield a specific value $ \hat \rho $ such that approximation with ratio $ < \hat \rho $ is NP-hard.
+
+But with an improved constraint Hastard could show an $ (\frac{8}{7}, \varepsilon)$ approx. for it would imply P = NP.
 
 \end{document}
 
