@@ -19,7 +19,7 @@
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 %\newtheorem{proposition}[theorem]{Proposition}
-%\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{corollary}[theorem]{Corollary}
 %% Definition Styles
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
@@ -53,6 +53,8 @@
 \maketitle
 
 \tableofcontents
+
+\newpage
 
 \part{Complexity Theory}
 \section{Randomized Complexity Classes}
@@ -186,9 +188,9 @@ What is the probability for false negatives? (or of no answer, in other interpre
 \end{itemize}
 
 error bound for matching case d=1
-it is easy to show that prob. (false negatives) $\leq 0.5 $ for one iteration $\rightarrow$ k repetitions $\rightarrow \leq \frac{1}{2^k} $
+it is easy to show that prob. (false negatives) $\leq 0.5 $ for one iteration $\rightarrow$ k repetitions $\rightarrow \leq \frac{1}{2^k} $ \newline
 
-this a algorithm belongs to the class of Monte Carlo algorithms.
+This a algorithm belongs to the class of Monte Carlo algorithms.
 
 \subsubsection{SAT (Satisfiability)}
 
@@ -2132,7 +2134,7 @@ A proof verifier will consist of the following four components
 	What we have so far proved the concept for a well-formed (``nice'') proof.
 	
 	Function tables $ L_1^a, L_2^a, L_3^a $.
-	Check $ P^{\Psi}(a) $ for a set of ranom $ \phi$s and accept if they all lead to the result 0 and reject if not.
+	Check $ P^{\Psi}(a) $ for a set of random $ \phi$s and accept if they all lead to the result 0 and reject if not.
 	
 	The number of required random bits is $ O(n^3) $ since the number of clauses on a non-trivial 3SAT instance $ \leq 2n + 4 \begin{pmatrix}n \\ 2 \end{pmatrix} + 8 \begin{pmatrix}n \\ 3 \end{pmatrix} = O(n^3) $.
 \end{enumerate} \bigskip
@@ -2399,7 +2401,7 @@ It is easy to see that $ r_A{BFD}^\infty = \frac{11}{9} $ (this is better than t
 \section{Complexity Classes}
 \subsection{Complexity classes APX, APX$^\ast$}
 
-\paragraph{Definition:} Let $ r(n) : \mathbb{N} \rightarrow [0, \infty) $ with $ r(n + 1) \geq r(n) \forall n \in \mathbb{N} $.
+\paragraph{Definition:} Let $ r(n) : \mathbb{N} \rightarrow [0, \infty) $ with $ r(n + 1) \geq r(n) \forall n \in \mathbb{N} $. \newline
 
 The complexity class APX$(r(n)) $ contains all optimisation problems which can be solved by an approximation algorithm $ A $ with (max.) approximate ratio $ r_A(n) \leq r(n) $ where $ A $ is required to run in polynomial time. \medskip
 
@@ -2513,15 +2515,15 @@ Next goal: deterministic $ \frac{8}{7} $-approximation algorithm.
 
 Use a derandomisation method based on conditional probabilities: fix the values for $ x_1, \dots x_n $ sequentially according to a suitably chosen order.
 
-We need to guarantee that at each step of this fixing process, we are left with a situation s.t. for a (suitable) random choice of the remaining variables, $ \geq {7}{8}m $ (or expected value) clauses can be satisfied.
+We need to guarantee that at each step of this fixing process, we are left with a situation s.t. for a (suitable) random choice of the remaining variables, $ \geq {7}{8}m $ (or expected value) clauses can be satisfied. \newline
 
-During the course of the algorithm, we end up with 0 to 3 fixed literals.
+During the course of the algorithm, we end up with 0 to 3 fixed literals. \newline
 
 Let $ b \in \{0, 1\} $.
 
 Consider $ a_j := E(X_j | x_n = b ) $, $ j = 1, \dots, m $.
 
-If by setting $ x_n = b $ the clause $ c_j $ is already satisfied, then we get $ a_j = 1 $. Otherwise $ \exists k \in \{1, 2, 3\} $ not yet fixed literals in $ c_j $.
+If by setting $ x_n = b $ the clause $ c_j $ is already satisfied, then we get $ a_j = 1 $. Otherwise $ \exists k \in \{1, 2, 3\} $ not yet fixed literals in $ c_j $. \newline
 
 Then it is easy to see that $ a_j = \frac{2^k - 1}{2^k} = 1 - \frac{1}{2^k} $.
 
@@ -2610,7 +2612,7 @@ $ v_{max} \leq \sum \limits_{j = 1}^n p_j $
 $ M(i, v) = \infty ~ \forall v < 0 $
 
 
-\item An optimal solution of KP can be optained in $ O(n \cdot V_{max} ) = O(n ^2 p_{max}) $
+\item An optimal solution of KP can be obtained in $ O(n \cdot V_{max} ) = O(n ^2 p_{max}) $
 
 $ p_{max} = max p_j,$ $ j = 1, \dots, n $.
 \end{itemize}
@@ -2619,7 +2621,170 @@ Idea: apply scaling (includes rounding) to the profits $ \rightarrow $ new, easi
 
 Consider the new KP instance with $ n $ items with the old weights, but changed profits: replace $ p_ j $ by $ \tilde p_j = \lfloor \frac{p_j}{t} \rfloor $ where $ t $ will be an appropriately chosen scaling factor.
 
-The Knapsack capacity stays the same. %% feasible solutions of the new solution are a feasible solution of the old one
+The Knapsack capacity $ b $ stays the same. %% feasible solutions of the new solution are a feasible solution of the old one
+
+
+%%% 19. Jänner
+%%% TODO: remove redundant info
+
+
+$ M[k + 1, v] = \min \{ M[K, v], M[k, v - p_{k + }] + w_{k + 1} $
+
+running time $ O(n V_{max} = O(n^2) p_{max})$ max $ p_j  \dots \lfloor \frac{p_j}{t} \rfloor $
+
+Generate a new Knapsack instance with weights $ w_j $ (unchanged), profits $ p_j $ 
+
+Knapsack capacity $ b $ (unchanged)
+
+where $ t $ is an appropriately chosen scaling factor. Here we will choose $ t := \frac{\varepsilon \max p_j}{(1 + \varepsilon) n} $
+
+\paragraph{Observation:} Feasibility for the old and the new instances is equivalent.
+
+Our algorithm: generate a new Knapsack instance as described above $ \tilde{KP} $ Solve $ \tilde{KP} $ exactly \newline
+
+Then output this solution as a solution for KP (it's feasible for KP, but in general not optimal)
+
+\begin{itemize}
+\item Running time: $ O(n^2 \max_{j = 1, \dots, n} \tilde{p_j}) = O(n^2 \max_j \left \{  \lfloor \frac{(1 + \varepsilon) n p_j}{\varepsilon max_j p_j} \rfloor  \right \} = O(n^2 \lfloor \frac{(1 + \varepsilon) n}{\varepsilon} \rfloor = O(\frac{n^3}{\varepsilon} + n^3 $. \newline
+
+polynomial in $ n $ and $ \frac{1}{\varepsilon} $ \newline
+
+check for an FPTAS.
+\item show that we get a $( + \varepsilon) $ approach \newline
+
+Let $ I^\ast $ be an optimal packing for (KP) instance $ I_t \subseteq \{1, \dots, n \} $ be the solution obtained by the approximation algorithm (optimal solution for $ (\tilde{KP}) $). \newline
+
+Both solutions are feasible for original problem $ \sum \limits_{j \in I_t} \tilde{p_j} \geq \sum \limits_{j \in I^\ast} \tilde{p_j} $ because $ I_t $ optimal solution for $ \tilde{KP} $ \newline
+
+Since $ \tilde{p_j} = \lfloor \frac{p_j}{t} \rfloor $ we get $ \frac{p_j}{t} - 1 \leq \tilde{p_j} \leq \frac{p_j}{t} $
+
+Set $ OPT := \sum \limits_{j \in I^\ast} p_j $
+
+$ t \cdot \sum \limits_{j \in I^\ast} \tilde{p_j} \geq t \cdot \sum \limits_{j \in I^\ast} (\frac{p_j1}{t} - 1) = \sum \limits_{j \in I^\ast} p_j - t \underbrace{|I^\ast|}_{\leq n} = OPT - t \cdot |I^\ast| \geq OPT - \frac{\varepsilon \max p_j}{(1 + \varepsilon) \cdot n} \cdot n \overset{\geq}{ex}  \frac{\varepsilon \max p_j}{(1 + \varepsilon)} \cdot OPT = OPT(1 - \frac{\varepsilon}{1 + \varepsilon} =  \frac{1}{1 + \varepsilon} $, i.e. the claimed result.
+\end{itemize}
+
+\section{Properties}
+In the area of approximation algorithms, one distinguishes between two types of results:
+\begin{itemize}
+\item positive – provide an algorithm with a certain approximation ratio $ \rightarrow $ a problem can be approximated at least that well
+\item negative – a result of the type ``unless \dots'', i.e. the given problem cannot be approximated with a ratio of \dots (like constant ratio of 3 etc.). Example: P = NP
+\end{itemize}
+
+\section{A Glimpse on Obtaining Negative Results – Classical Gap Technique}
+
+typically relies on NP-completeness proofs $ \rightarrow $ gap problem. \newline
+
+Suppose $ Q $ is an optimisation problem for which for all input $ x $ we either have $ V_{opt} \leq a $ or $ V_{opt} \geq b > a $ and such that it is NP-complete to decide which of the two cases arises $ \rightarrow $ $(a, b) $ gap problem
+
+Suppose $ \exists $ approximation algorithm (polyn. algorithm) $ A $ for $ Q $ with ratio $ < \frac{b}{a} $ for $(a, b) $ gap problem $ \Rightarrow $ P = NP
+
+\begin{theorem}
+
+Let $ Q $ be an $ (a, b) $ gap problem. Then $ \not \exists $ approximation algorithm for $ Q $ with ratio $ < \frac{b}{a} $ unless P = NP
+
+\end{theorem}
+
+\subsection{Examples}
+\subsubsection{TSP}
+
+TSP with distance matrix $ D $.
+
+We know that the Hamiltonian cycle problem is NP-complete. Construct the following TSP instance with distance matrix $ D = d_{ij} $:
+
+$ d_{ij} = \left \{ \begin{array}{c l} 1 & \{i, j\} \in E \\ n \cdot 2^n & \{i, j\} \not \in E \end{array} \right. $
+
+\paragraph{Observations:}
+\begin{enumerate}
+\item If $ G $ contains a Hamiltonian Cycle, the optimal tour w.r.t. $ D $ has length $ n $ ($ n \cdot 1$)
+\item If $ G $ does not contain an HC, the shortest TSP tour has a length $ \geq (n - 1) \cdot 1  + n \cdot 2^n $
+
+$ \rightarrow ~ (n, n-1 + n \cdot 2^n)$ gap problem
+
+$ \rightarrow $ there cannot be an approximation algorithm for the TSP with ratio $ 2^n $ unless P = NP
+
+$ \rightarrow $ TSP $ \not \in $ APX unless P $ \neq $ NP
+
+\item If $ D $ is metric ($ d $ symmetric and fulfills triangle inequality), there exists a $ \frac{3}{2} $ algorithm (Christofides) \newline
+
+If $ D $ comes from Euclid distance of $ n $ points, then there even exists a PTAS
+
+\end{enumerate}
+
+
+\subsubsection{Bin Packing}
+
+$(2, 3)$ gap problem $ \rightarrow ~D $ approximation algorithm with ratio $ \frac{3}{2} $ unless P = NP
+
+\paragraph{Remark} For bin packing, there exists an asymptotic approximation algorithm with an asymptotic ratio $ < \frac{3}{2} $ (e.g. for BFD even an asympt. approx. scheme with $ \frac{11}{9} $ exists).
+
+\subsubsection{Vertex Coloring}
+
+$(3, 4)$ gap problem (side result of the result that 3-COLORING is hard) $ \Rightarrow ~ \not \exists $ approximation algorithm with ratio $ < \frac{4}{3} $ unless P = NP
+
+There is no asymptotic approximation algorithm for VC. Given $ G \overset{\rightarrow}{blow-up technique} G_K = (V_K, E_K) $ such that $ \underset{\Xi}{min. no. of colours needed}(G_K) = K \cdot \Xi(G) $
+
+$ (3, 4) $ gap $ \rightarrow (3K, 4K) $ gap problem.
+
+\subsection{XX}
+
+\begin{theorem}
+If P $ \neq $ NP, NP-complete problems with small solution value ($ \exists $ poylnomial $ p $ such that for all inputs $ x ~\forall $ feasible solutions $ s \in S(x) : ~ v(x, s) \in \mathbb{Z}_0^+, v(x, s) \leq p(|x|) )$ 
+\end{theorem}
+
+\begin{proof}
+Exercise
+\end{proof}
+
+\begin{corollary}
+If N $ \neq $ NP, $ \exists $ FPTAS for problems which are NP-complete in the strong sense 
+\end{corollary}
+
+Simple problems with small solution values:
+\begin{itemize}
+\item CLIQUE
+\item MAXSAT
+\item VERTEX COVER
+\end{itemize} \medskip
+
+In contrast to
+\begin{itemize}
+\item KNAPSACK
+\item PARTITION
+\end{itemize}
+
+\section{A Glimpse on Obtaining Negative Results – PCP Based}
+
+Consider MAX 3SAT
+\paragraph{Given:} 3SAT formula $ \Phi $.
+\paragraph{Task:} Find truth assignment which maximises the number of satisfied clauses
+
+val$( \underset{I}{\text{MAX 3SAT instance}}) = \frac{\text{max \# of satisf. clauses}}{\#\text{clauses}} $
+
+In 1992 it was shown using PCP techniques that there does not exist a $ \rho $ approach algorithm for MAX SAT for all $ \rho > 1 $ unless P = NP. \newline
+
+\subsection{Alternative Formulation of the PCP Theorem}
+
+\begin{theorem}
+(Second version of PCP)
+
+$ \exists $ constant $ \rho > 1$ s.t. for all languages $ L \in $ NP, $ \exists $ a function $ f $ computable in polyn. time which maps strings to (representations of) 3SAT formulas s.t.
+
+$ \left. \begin{array}{l} x \in L \Rightarrow \text{val}(f(x)) = 1 \\
+x \not \in L \Rightarrow \text{val}(f(x)) < \rho \end{array}
+\right\} $
+gap problem
+\end{theorem}
+
+\begin{corollary}
+$ J $ constant $ \rho > 1 $ such that a $ \rho $ approx. for MAX 3SAT implies P = NP
+\end{corollary}
+
+\begin{proof}
+
+% eq of PCP formulations: consider CSP (constraint satisfaction problem)
+% q CSP (collection of functions), q \in N ...
+
+\end{proof}
 
 
 \end{document}

@@ -1,0 +1,206 @@
+%%!TEX TS-program = latex
+
+\documentclass[11pt]{article}
+\usepackage[a4paper]{geometry}
+%\usepackage[pdftex]{graphicx}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{array}
+
+% Theorem Styles
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{corollary}[theorem]{Corollary}
+%% Definition Styles
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+%\newtheorem{example}{Example}[section]
+%\theoremstyle{remark}
+%\newtheorem{remark}{Remark}
+
+\usepackage{longtable}
+
+% Graphen etc.
+\usepackage{pst-node}
+\usepackage{pst-tree}
+
+\newcommand{\rcirclenode}[3]{
+	\circlenode{\# 1}{\parbox{\# 2}{\centering\# 3}}
+}
+
+\usepackage{hyperref}
+
+% Das Dokument beginnt hier
+\begin{document}
+
+\setlength{\parindent}{0pt}
+
+% Erstelle eine Hauptüberschrift
+
+\title{Theoretische Informatik 2 Exercises}
+\author{}
+\date {}
+
+\maketitle
+
+\section*{Exercise 32}
+
+\paragraph{Given:}
+$ f: \{0, 1\}^\ast \rightarrow \{0, 1\}^\ast $ one-way permutation
+
+\paragraph{Task:} Show that $ f^k $ is one-way $ \forall k \in \mathbb{N} $
+
+\begin{proof}
+
+by induction on $ k $.
+
+\begin{itemize}
+\item $ k = 1 $
+\item $ k > 1 $
+
+	$ k = 2 $
+	
+	By hypothesis, we have that for every probabilistic polynomial time algorithm $ A $, the following holds $ \forall n \in \mathbb{N} $:
+	
+	\[ \mathbb{P}(f (A(f(x))) = f(x) ) < \varepsilon(n),~ x \in \{0, 1\}^n \]
+	
+	Consider an arbitrary probabilistic polynomial algorithm $ B $. Observe that 
+	\[ \mathbb{P}(f^2 (B (f^2(x)) = f^2(x) ) = P(f(f(B(f(f(x))))) = f(f(x))) \]
+	
+	A permutation is bijective, so there exists an inverse function $ f^{-1} $ $ \rightarrow $ apply $ f^{-1} $ on both sides and yield
+	
+	\[ \mathbb{P} (f(B(f(f(x)))) = f(x)) = \mathbb{P}[ f(\underbrace{B \circ f(x))}_{\text{a prob. polyn. alg.}} = f(x)] < \varepsilon \]
+	$ \Rightarrow $ defining $A:= B \circ f $ we can show the assumption
+\end{itemize}
+
+\end{proof}
+
+\section*{Exercise 34}
+
+\begin{enumerate}
+\item[a.] Prove that PCP$(0, \log n) = $ P
+	% no random bits allowed
+		
+	\begin{itemize}
+	\item ``P $ \subseteq $ PCP$(0, \log n) $'' \newline
+	
+		Let $ L \in $ P. A verifier $ V $ of PCP$(0, 0) \subseteq $ PCP$(0, \log n) $ has polynomial running time and can decide $ L $.
+	
+	\item ``P $ \supseteq $ PCP$(0, \log n) $'' \newline
+	
+	Algorithm:
+	
+		For each proof ($ O(2^{\log n}) = O(n)) $
+			If $ V $ accepts, accept
+		Else
+			Reject
+			
+	Total running time: $ O(n) \cdot \text{poly}(n) = \text{poly}(n) $
+	\end{itemize}
+
+\item[b.] Prove that PCP$(0, \text{poly}( n)) = $ P
+	\begin{itemize}
+	\item There is a verifier $ V $ polynomial, deterministic
+	\item $ V $ decides $ L $
+	\item $ P(...) < \frac{1}{2} $ means 0 (no random bits)
+	\end{itemize}
+
+\end{enumerate}
+
+
+\section*{Exercise 35}
+
+Show that PCP$(\log n, 1) \subseteq $ NP.
+
+\begin{proof}
+
+Let $ L \in $ PCP$(log n, 1) $. We build a non-deterministic TM $ M $ which works as follows:
+\begin{enumerate}
+\item $ M $ generates non-deterministically all the proofs of length at most $ ^\cdot 2^{O(\log n)} $. This can be done in $ O(\log n) $ steps.
+\item $ M $ generates non-deterministically all the $ 2^{O(\log n)} $ possible sequences of coin tosses
+\item $ M $ emulates the verifier on all these toss sequences ($ M \in $ PCP)
+\item $ M $ accepts $ \Leftrightarrow $ the verifier accepts on all these sequences
+\end{enumerate}
+
+$ \rightarrow M $ runs in $ 2^{O(\log n )} = \bigcup \limits_{c \geq 0} n^c \Rightarrow L \in $ NP
+
+\end{proof}
+
+\section*{Exercise 37}
+
+\paragraph{Task:} Provide a PCP(poly$(n,1)$ verifier for the complement of the graph isomorphism problem.
+
+$ \overline{\text{GI}} $ is the complement of GI, i.e. the language consisting of non-isomorphic graphs. \newline
+
+\paragraph{Input:} graphs $ G_0, G_1 $ which both have $ n $vertices and $ m $ edges.
+
+The verifier expects the proof $ \Pi $ to contain a bit $ \Pi(H) $ $(\in \{0, 1\}) $ for each labeled graph with $ n $ nodes such that $ \Pi(H) \in \{0, 1\} $ corresponding to whether $ H \cong G_0 $ or $ H \cong G_1 $ \newline
+
+$ \rightarrow $ in other words, $ \Pi $ can be seen as an exponentially long array of bits indexed by all possible graphs on $ n $ vertices.
+
+Verifier picks random bit $ b \in \{0, 1\} $ and a random permutation $ \rho \in S_n $ \newline
+
+Apply $ \rho $ to vertices of $ G_b $.
+
+$ \rightarrow $ Leads to graph $ H \cong G_b $
+
+Verifier queries the proof bit $ \Pi(H) $ and accepts if this bit equals $ b $
+
+\begin{enumerate}
+\item[Case 1:] $ G_0 \not \cong G_1 $ \newline
+	In this case $ \Pi $ can be set up such that the verifier accepts with probability 1
+\item[Case 2:] $ G_0 \cong G_1 $ \newline
+	The probability that any proof makes the verifier accept is at most $ \frac{1}{2} $
+\end{enumerate}
+
+\section*{Exercise 39}
+
+\[ (x_1 \vee x_2 \vee x_3) \wedge (\overline{x_1} \vee \overline{x_3} \vee x_4) \wedge (x_2 \vee x_3 \vee \overline{x_4}) \]
+
+\begin{enumerate}
+\item[a.] \[ q = (1 - x_1) \cdot x_2 \cdot (1 - x_3) + x_1 \cdot x_3 \cdot (1 - x_4) + (1 - x_2) \cdot (1 - x_2) \cdot x_4 \]
+	\[ = x_2 - x_1 \cdot x_2 - x_2 \cdot x_3 + x_1  \cdot x_2 \cdot x_3 + x_1 \cdot x_3 - x_1 \cdot x_3 \cdot x_4 + x_4 - x_2 \cdot x_4 - x_3 \cdot x_4 + x_2 \cdot x_3 \cdot x_4\]
+	\[ = x_2 + x_4 - x_1 \cdot x_2 + x_1 x_3 - x_2 x_3 - x_2 x_4 + x_1 x_2 x_3 - x_1 x_3 x_4 + x_2 x_3 x_4 \]
+\item[b.] \[ I_q^1 = \{2, 4\} \]
+ \[ I_q^2 = \{(1,2), (1, 3), (2, 3), (2, 4), (3, 4)\} \]
+  \[ I_q^3 = \{(1, 2, 3), (1, 3, 4), (2, 3, 4)\} \]
+\item[c.] \[ a = (1, 0, 1, 1) \]
+	\[ \gamma + L_1^q(a_1^1) + L_2^q(c_1^2) + L_2^(c_q^3) \]
+	
+	\[ C_{q_i}^1 = \left\{ \begin{array}{c l}1 & i \in I_1^1 \\ 0 & i \not \in I_1^1 \end{array} \right. \]
+	
+	\[ \gamma_q = 0 \]
+	(since the polynomial has no constant term)
+	
+	\[ L_1^a (c_q^1) = a_2 + a_4 = 1 \]
+	\[ L_2^a (c_q^1) = a_1 a_2 + a_1 a_3 + a_2 a_3 + a_2 a_4 + a_3 a_4 = 0 (2) \]
+	\[ L_3^a (c_q^1) = a1 a_2 a_3 + a_1 a_3 a_4 + a_2 a_3 a_4 = 1 \]
+	
+	\[ \sum = 0 + 1 + 0 + 1 = 0. (2) \]
+	
+	Insert into the original formula
+	
+	0 + 0 + 0 = 0
+
+\end{enumerate}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
