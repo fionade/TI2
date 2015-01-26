@@ -2830,11 +2830,234 @@ length of proof & number of variables \\
 
 error probability (typ. $ \frac{1}{2} $ & max. of val(c) in no case
 \end{tabular}
+
 \end{proof}
 
 So far: if P $ \neq $ NP, MAX 3SAT cannot be approximated arbitrarily close to 1. This does yield a specific value $ \hat \rho $ such that approximation with ratio $ < \hat \rho $ is NP-hard.
 
-But with an improved constraint Hastard could show an $ (\frac{8}{7}, \varepsilon)$ approx. for it would imply P = NP.
+But with an improved constraint Hastard could show an $ (\frac{8}{7}, \varepsilon)$ approx. for it would imply P = NP. \newline
+
+%%%% 26. Jänner 2015
+
+Two negative results which can be obtained by application of the PCP theorem:
+
+So far: mentioned connections between the approximation of (MAX)SAT, CSP (constraint satisfaction problem)
+
+Now consider VERTEX COVER, INDEPENDENT SET
+
+\begin{theorem}
+\begin{enumerate}
+\item $ \exists $ constant $ \beta > 1 $ s.t.  obtaining a $ \gamma $-approximation for VERTEX COVER is NP-hard
+\item  $ \forall $ constants $ \beta > 1 $ obtaining a $ \beta $-approximation for INDEPENDENT SET is NP-hard
+\end{enumerate}
+
+\end{theorem}
+
+\paragraph{Comments:}
+\begin{itemize}
+\item (b) is stronger than (a). IND SET $ \not \in  $ APX unless NP $ \neq $ p
+
+VERTEX COVER  $ \in $ APX (we provided a 2-approximation alg. but VERTEX COVER $ \not \in $ PTAS unless P = NP.
+\item Two algorithms which are equivalent regarding optimisation not necessarily equiv. for approximation
+\item For NP problems, function problems, \dots: meaningful notion of reduction $ \rightarrow $ how to use for approximation algorithms? Literature: various notions, here: PTAS-reductions
+\end{itemize}
+
+\section{PTAS Reductions}
+
+\begin{figure}
+
+	\centering
+	\psmatrix[rowsep=0.4cm, colsep=2.5cm]
+		Problem A & Problem B \\
+		$ x $ & $ f(x) = x' $ \\
+		$ s = g(s') $ & $ s' \in S_B(x') $ \\
+		$ s \in S_A(x) $ & feas. solution for B \\
+	\psset{arrows=->,nodesep=3pt}
+	\ncarc{2,1}{2,2}
+	\naput{$f$}
+	\ncarc{3,2}{3,1}
+	\naput{$g$}
+	\endpsmatrix
+	
+	\caption{PTAS reduction}
+
+\end{figure}
+
+For a PTAS reduction: apply a PTAS for B and make sure that $ r_B (x', s') \leq 1 + \alpha (\varepsilon) $ %%%% $
+
+
+\paragraph{Definition:} A PTAS reduction from problem A to problem B $ (A \leq_{PTAS} P ) $ is described by a triple $ (f, g, \alpha )$ where
+\begin{itemize}
+\item For each input $ x $ of an instance of $ A $, we can compute in polynomial tima  (in $| x | $) the input $ f(x) $ of an instance of problem $ B $
+\item For the input $ x $ of $ A $ and a solution $ s' \in S_B(f(x)) $ and $ \varepsilon \in \mathbb{Q}^+ g(x, s', \varepsilon) $ is computable in polynomial time
+\item $ \alpha: \mathbb{Q}^+ \rightarrow \mathbb{Q} $ surjective, in polynomial time computable and s. t.
+
+$ r_B (f(x), s') \leq 1 + \alpha(\varepsilon ) \Rightarrow r_A(x, g(x, s', \varepsilon)) \leq 1 + \varepsilon \hfill (\ast) $ %%
+\end{itemize}
+
+One can easily show that the binary relation $ \leq_{PTAS} $ has the following properties:
+\begin{itemize}
+\item reflexive
+\item transitive
+\end{itemize}
+
+We can define a relation $ =_{PTAS} $ by defining $ A =_{PTAS} B \Leftrightarrow A \leq_{PTAS} B,  B \leq_{PTAS} A $
+
+For example CLIQUE  $=_{PTAS} $ IND. SET
+
+\begin{lemma}
+$ A \leq_{PTAS} B, B \in $ PTAS $ \Rightarrow A \in PTAS $
+
+(justification for the name PTAS reduction)
+\end{lemma}
+
+\begin{proof}
+We need a PTAS for $ A $, input $ x, \varepsilon $. Apply the PTAS for $ B $ to the input $ f(x) $ and ask for quality $ 1 + \alpha(\varepsilon) \rightarrow $ we get solution $ s' \in S_B(f(x)) $ with $ r_B (f(x), s') \leq 1 + \alpha(\varepsilon) $. \newline
+
+Output $ s = \underbrace{g(x, s', \varepsilon)}_{\in S_A(x)} $ as approximative solution for $ A $. Due to $ (\ast) $, we have $ r_A(x, s) \leq 1 + \varepsilon \rightarrow $ we have a PTAS for A.
+\end{proof}
+
+\section{L reduction}
+
+Slightly different from PTAS reduction:
+\begin{itemize}
+\item $ f $ and $ g $ as in definition of PTAS reduction
+\item For an L reduction, we require the existence of two constants $ c_1 > 0 $ and $ c_2 > 0 $ s.t.
+	\begin{itemize}
+	\item $ V_{B, opt} (f(x)) \leq c_1 V_{A, opt} (x) \forall $ inputs $ x $ for $ A $
+	\item $ |V_{A, opt} (x) - V_A (x, g, (x, s)) | \leq c_2 | v_{B, opt} (f(x)) - V_B(f(x), s') | ~\forall $ inputs $ x $ for $ A $
+	\end{itemize}
+\end{itemize}
+
+``L'' stands for linear. \newline
+
+Optional exercise: Prove that MAX 3SAT is L-reducible to MAX 2SAT (boils down to providing specific values for $ c_1 $ and $ c_2 $
+
+
+\begin{theorem}
+
+MAX 3SAT $ \leq_{PTAS} $ CLIQUE (max. version)
+\end{theorem}
+
+\begin{proof} Idea: apply the standard reduction for decision problems between 3SAT $ \leq_P $ CLIQUE.
+
+\paragraph{Given:} 3SAT formula $ \Phi = \bigwedge_{i = 1}^m C_i $
+
+In the classic reduction we exploit that $ \Phi $ is satisfiable $ \Leftrightarrow $ the constructed instance $ f(\Phi) $ of CLIQUE has a clique of cardinality $ m $.
+
+We exploit here the generalisation
+If $ \geq k $ clauses are satisfied $ \Leftrightarrow \exists $ clique with cardinality $ \geq k $.
+
+\begin{tabular}{c c c c}
+& Lit. 1 & Lit. 2 & Lit. 3 \\
+\hline
+$ c_1 $ & $ \circ $ & $ \circ $ & $ \circ $ \\
+\vdots & \vdots & \vdots & \vdots \\
+$ c_i $ & $ \circ v_{i_1} $ & $ \circ v_{i_2} $ & $ \circ v_{i_3} $ \\
+\vdots \\
+$ c_m $
+\end{tabular}
+
+$ \rightarrow $ build up a graph vertices $ v_{kl} $ we have edges between vertices in different rows which correspond to non-contradicting literals.
+
+Suppose the clauses $ c_{i1}, \dots, c_{ik} $ are simultaneously satisfiable $ \rightarrow $ in each clause $ \geq $ one satisfied literal. By construction, we get a $ k $ clique in graph.
+
+\end{proof}
+
+Not ever kind of transformation which is useful in optimisation context (or for decision problems) is useful in approximation context.
+
+\subsection{Example}
+
+MAX 4SAT $ \rightarrow $ MAX 3SAT
+
+4 SAT formula $ \Phi $, clauses $ c_1, \dots, c_m $
+
+$ ci = l_{i_1} \vee l_{i_2} \vee  l_{i_3} \vee  l_{i_4} \rightarrow $ idea: introduce new variable $ z_i $ and split this into 2 3SAT clauses
+
+$ (l_{i_1} \vee l_{i_2} \vee  z_{i}) \wedge (l_{i_1} \vee l_{i_2} \vee  \overline{z_{i}}) $
+
+Here we obtain a new MAX 3SAT instance for which there exists a trivial 2-approximation $ \rightarrow $ not usable for PTAS reduction
+
+\paragraph{Comment:} we should have limited our attention to the following subclass of optimisation problem called NPO (counterpart for NP for decision problems)
+
+\paragraph{Definition (NPO):} An optimisation problem $ A $ belongs to NPO if
+\begin{itemize}
+\item $ \forall x $ and $ s \in S_A(x) $, the objective function value $ v(x, s) \in \mathbb{Z} $ (or $ \mathbb{Q}$)
+\item $ \forall x $ and $ s $ the test whether $ s \in S(x) $ $ \hat = s $ is feasible should be possible in polynomial time
+\item $ v(x, s) $ should be computable in polynomial time $ \forall x $, $ s \in S(x) $.
+\end{itemize}
+When talking about APX, PTAS, we essentially have APX $ \cap $ NPO, PTAS $ \cap $ NPO in mind.
+
+\paragraph{Definition:} an optimisation problem $ A $ is called NPO-complete if
+\begin{itemize}
+\item $ A \in $ NPO
+\item $ \forall B \in $ NPO: $ B \leq_{PTAS} A $
+\end{itemize}
+
+One can show that e.g. MAX WEIGHTED SAT is NPO-complete.
+
+
+\section{Closing Remarks}
+
+\subsection{Obtaining Approximation Algorithms}
+A very helpful technique for obtaining approximation algorithms is setting up a formulation as an integer program and then considering the linear relaxation
+
+\subsubsection{Example: VERTEX COVER}
+
+\paragraph{Given:} undirected graph $ G = (V, E) $, vertex weights $ w_i \geq 0 $ (unweighted case $ w_i = 1 \forall i \in V $).
+
+model vertex cover by 0-1 variable
+\begin{itemize}
+\item $ x_i \in \{ 0, 1 \} $; $ x_i = 1 \Leftrightarrow i \in $ vertex cover
+\item weight of vertex cover: $ \sum_{i \in V} w_i x_i $
+\item $ x_i + x_j \geq 1 $ $ \forall \{i, j \} \in E $
+\item $ x_i \in \{0, 1\} $ \hfill $(\triangle)$
+\end{itemize}
+
+Consider now the linear relaxation obtained by replacing $(\triangle)$ by $ 0 \leq x_i \leq 1 $ \newline
+
+$ \rightarrow $ we obtain a linear program which can be solved in polynomial time (with a nice special algorithm) \newline
+
+Let $ x^\ast $ be such an optimal solution of relaxation (R).
+
+$ \rightarrow $ Apply the following simple rounding technique:
+
+Set $ \tilde{x_i} = \left\{ \begin{array}{c l} 0 & \text{if } x_i^\ast < \frac{1}{2} \\
+1 & \text{if } x_i^\ast \geq \frac{1}{2} \end{array}\right. $
+
+$ \tilde{x} $ is feasible for (VC) $ \rightarrow $ approximation quality 2 (also for weighted case)
+
+\subsubsection{Example: MAX SAT}
+
+2 groups of 2 variables
+
+\begin{itemize}
+\item $ x $-variables $ x_i \in \{0, 1\} $; $ x_i = 1 \leftrightarrow x_i = $ true; $ x_i = 0 \leftrightarrow x_i = $ false
+\item $ z $-variables $ z_j \in \{0, 1\} $; $ z_j = 1 \leftrightarrow $ clause $ c_j $ is satisfied
+\end{itemize}
+
+$ \max \sum \limits_{j = 1}^m z_j $ ($ \rightarrow $ number of satisfied clauses)
+
+$ \sum \limits_{x_i \in V_j^+} x_i + \sum \limits_{x_i \in V_j^-} (1 - x_i ) \geq z_j  \forall j = 1, \dots, m $ (it is only a real requirement if $ z_j = 1 $)
+
+For clause $ c_j $, let
+\begin{itemize}
+\item $ V_j^+ $ denote the positives variables in the clause
+\item $ V_j^- $ denote the negative variables in the clause
+\end{itemize}
+
+$ c_j \underbrace{x_4}_{\text{pos}} \vee \overline{x_5} \vee \underbrace{x_6}_{\text{pos}} \vee \overline{x_8} $
+
+
+Solve linear relaxation $ \rightarrow (X^\ast, z^\ast ) $ is an optimal solution ($ z $ is not important, $ x^\ast $ in general not integral)
+
+\paragraph{Idea:} randomised rounding
+
+Set $ \hat X_i := \left\{ \begin{array}{c l} 1 & \text{with prob. } x_i^k \\ 0 & \text{with prob. } 1 - x_i^\ast \end{array} \right. $
+
+One can show that the algorithm above has an expected approximation ratio of $ \frac{e}{e-1} $. \newline
+
+There exist many improvements.
 
 \end{document}
 

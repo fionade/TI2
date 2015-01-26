@@ -83,3 +83,10 @@
 \BOOKMARK [2][-]{subsection.11.2}{Implications}{section.11}% 83
 \BOOKMARK [1][-]{section.12}{A Glimpse on Obtaining Negative Results \205 PCP Based}{part.2}% 84
 \BOOKMARK [2][-]{subsection.12.1}{Alternative Formulation of the PCP Theorem}{section.12}% 85
+\BOOKMARK [1][-]{section.13}{PTAS Reductions}{part.2}% 86
+\BOOKMARK [1][-]{section.14}{L reduction}{part.2}% 87
+\BOOKMARK [2][-]{subsection.14.1}{Example}{section.14}% 88
+\BOOKMARK [1][-]{section.15}{Closing Remarks}{part.2}% 89
+\BOOKMARK [2][-]{subsection.15.1}{Obtaining Approximation Algorithms}{section.15}% 90
+\BOOKMARK [3][-]{subsubsection.15.1.1}{Example: VERTEX COVER}{subsection.15.1}% 91
+\BOOKMARK [3][-]{subsubsection.15.1.2}{Example: MAX SAT}{subsection.15.1}% 92
